@@ -157,5 +157,5 @@ def get_me(current_user: User = Depends(get_current_user)):
 
 @router.post("/logout")
 def logout(current_user: User = Depends(get_current_user)):
-    """Logs out the user and acknowledges session termination."""
+    """Acknowledges logout; the client must discard its bearer token."""
     return {"message": "Successfully logged out. Client should discard the access token."}
