@@ -19,27 +19,27 @@ export const Modal = ({ isOpen, onClose, title, subtitle, children, maxWidth = '
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-xl animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0D1C2D]/60 backdrop-blur-md animate-in fade-in duration-200">
       <div 
         className="fixed inset-0" 
         onClick={onClose} 
       />
       
       <div 
-        className={`relative w-full ${maxWidth} bg-black/85 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-[0_24px_64px_rgba(0,0,0,0.9)] z-10 max-h-[90vh] flex flex-col overflow-hidden text-slate-100`}
+        className={`relative w-full ${maxWidth} bg-[#FCFBF9] border border-[#D8D2C6] rounded-3xl shadow-[0_24px_64px_rgba(23,45,70,0.25)] z-10 max-h-[90vh] flex flex-col overflow-hidden text-[#172D46]`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Specular top highlight */}
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-sky-400/50 to-transparent" />
+        {/* Antique Gold to Steel Blue top accent hairline */}
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#294D6B] via-[#C5A77B] to-[#294D6B]" />
 
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/[0.02]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#D8D2C6] bg-[#F8F6F1]/90">
           <div>
-            <h3 className="text-base font-semibold text-white tracking-tight">{title}</h3>
-            {subtitle && <p className="text-xs text-sky-400/90 mt-0.5 font-mono">{subtitle}</p>}
+            <h3 className="font-serif-clean text-lg font-bold text-[#172D46] tracking-tight">{title}</h3>
+            {subtitle && <p className="text-xs text-[#294D6B] mt-0.5 font-mono">{subtitle}</p>}
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-white hover:bg-white/[0.08] rounded-xl transition-colors"
+            className="p-1.5 text-[#5E7A91] hover:text-[#172D46] hover:bg-[#E8E4DC]/60 rounded-xl transition-colors"
           >
             <X className="w-5 h-5" />
           </button>

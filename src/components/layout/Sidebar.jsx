@@ -1,88 +1,93 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
-  LayoutDashboard, 
-  Briefcase, 
-  FileText, 
-  FolderLock, 
-  Clock, 
-  Share2, 
-  CheckCircle2, 
-  GitFork, 
-  FileSpreadsheet, 
-  ShieldCheck, 
+  Home,
+  FileText,
+  Search,
+  BookOpen,
+  Headphones,
+  FolderLock,
+  Clock,
+  Share2,
+  CheckCircle2,
+  GitFork,
+  ShieldCheck,
   LogOut
 } from 'lucide-react';
-import { useCase } from '../../context/CaseContext';
 import { useAuth } from '../../context/AuthContext';
 
 const NAV_ITEMS = [
-  { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { path: '/cases', label: 'Assigned Cases', icon: Briefcase },
-  { path: '/statement-review', label: 'Statement Review', icon: FileText, badge: 'Diff' },
-  { path: '/evidence', label: 'Evidence Explorer', icon: FolderLock },
+  { path: '/dashboard', label: 'Dashboard', icon: Home },
+  { path: '/cases', label: 'Report Incident', icon: FileText },
+  { path: '/evidence', label: 'Track Status', icon: Search },
+  { path: '/statement-review', label: 'Statement Review', icon: FileText },
   { path: '/timeline', label: 'Timeline Analysis', icon: Clock },
-  { path: '/correlation', label: 'Service Correlation', icon: Share2, badge: 'Flow' },
-  { path: '/claim-verification', label: 'Claim Verification', icon: CheckCircle2, badge: '4-Tier' },
+  { path: '/correlation', label: 'Service Correlation', icon: Share2 },
+  { path: '/claim-verification', label: 'Claim Verification', icon: CheckCircle2 },
   { path: '/root-cause', label: 'Root Cause Analysis', icon: GitFork },
-  { path: '/reports', label: 'Investigation Reports', icon: FileSpreadsheet },
-  { path: '/audit-logs', label: 'Audit Logs', icon: ShieldCheck }
+  { path: '/reports', label: 'Resources', icon: BookOpen },
+  { path: '/audit-logs', label: 'Help & Support', icon: Headphones }
 ];
 
 export const Sidebar = ({ mobileOpen, setMobileOpen }) => {
-  const { currentCase } = useCase();
-  const { currentUser, logout } = useAuth();
+  const { logout } = useAuth();
 
   return (
     <>
       {/* Mobile Backdrop */}
       {mobileOpen && (
         <div 
-          className="fixed inset-0 bg-black/80 backdrop-blur-md z-40 lg:hidden"
+          className="fixed inset-0 bg-[#0a1827]/60 backdrop-blur-xs z-40 lg:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
       <aside className={`
         fixed top-0 bottom-0 left-0 z-50 w-64
-        bg-black/65 backdrop-blur-2xl border-r border-white/10 shadow-[4px_0_32px_rgba(0,0,0,0.7)]
-        flex flex-col transition-transform duration-200 ease-in-out
+        bg-gradient-to-b from-[#172D46] via-[#15283E] to-[#101F31]
+        border-r border-[#0D1C2D] shadow-[4px_0_24px_rgba(10,24,39,0.35)]
+        flex flex-col justify-between transition-transform duration-200 ease-in-out
+        overflow-hidden
         ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
-        {/* Brand Header */}
-        <div className="h-16 flex items-center gap-3 px-5 border-b border-white/10 bg-white/[0.02]">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-sky-400 via-sky-500 to-rose-500 flex items-center justify-center shadow-[0_0_20px_rgba(14,165,233,0.4)] text-black font-black text-sm">
-            F1
+        {/* Top Section: Shield Fingerprint Emblem & Brand Title (Image 4 Typography) */}
+        <div className="pt-7 pb-4 px-6 flex flex-col items-center text-center shrink-0">
+          {/* Antique Gold Shield with Fingerprint Emblem */}
+          <div className="relative mb-3 flex items-center justify-center">
+            <svg width="68" height="82" viewBox="0 0 100 120" fill="none" className="drop-shadow-xs">
+              {/* Outer Shield Border */}
+              <path
+                d="M50 8 C68 8 86 12 88 30 C88 72 66 102 50 114 C34 102 12 72 12 30 C14 12 32 8 50 8 Z"
+                stroke="#C5A77B"
+                strokeWidth="3.2"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+              />
+              {/* Concentric Fingerprint Ridges */}
+              <g stroke="#C5A77B" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" opacity="0.95">
+                <path d="M38 24 C45 21 55 21 62 24" />
+                <path d="M32 30 C42 26 58 26 68 30" />
+                <path d="M26 40 C38 34 62 34 74 40" />
+                <path d="M24 54 C24 38 76 38 76 54 C76 76 65 94 50 102 C35 94 24 76 24 54" />
+                <path d="M30 56 C30 44 70 44 70 56 C70 72 61 86 50 93 C39 86 30 72 30 56" />
+                <path d="M36 58 C36 49 64 49 64 58 C64 68 57 78 50 84 C43 78 36 68 36 58" />
+                <path d="M42 60 C42 54 58 54 58 60 C58 66 54 72 50 76 C46 72 42 66 42 60" />
+                <path d="M48 62 C48 60 52 60 52 62 C52 65 50 68 50 70" />
+              </g>
+            </svg>
           </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="font-bold text-sm tracking-wide text-slate-100">FRAGMENT</span>
-              <span className="font-extrabold text-xs px-1.5 py-0.5 rounded-md bg-rose-500/20 text-rose-300 border border-rose-500/40 shadow-[0_0_10px_rgba(255,0,127,0.3)]">
-                FIRST
-              </span>
-            </div>
-            <p className="text-[10px] text-sky-400 font-mono tracking-wider">AUTHORITY TERMINAL</p>
-          </div>
-        </div>
 
-        {/* Active Case Context Pill */}
-        <div className="p-3 mx-3 mt-3 mb-1 rounded-xl bg-white/[0.03] backdrop-blur-xl border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)]">
-          <div className="flex items-center justify-between text-[11px] mb-1">
-            <span className="font-mono text-sky-400 font-medium">ACTIVE DOSSIER</span>
-            <span className="px-1.5 py-0.2 bg-rose-500/20 text-rose-300 rounded border border-rose-500/30 text-[9px] uppercase font-mono shadow-[0_0_8px_rgba(255,0,127,0.25)]">
-              {currentCase.priority}
-            </span>
-          </div>
-          <div className="font-semibold text-xs text-slate-100 truncate" title={currentCase.title}>
-            {currentCase.id}
-          </div>
-          <div className="text-[11px] text-slate-400 truncate mt-0.5">
-            {currentCase.incidentType}
-          </div>
+          {/* Centered Brand Title matching Image 4 lettering */}
+          <h1 className="font-brand text-2xl font-bold tracking-tight text-[#E8E4DC] leading-tight drop-shadow-xs">
+            Fragments<br />First
+          </h1>
+
+          {/* Subtle Horizontal Divider */}
+          <div className="w-40 h-[1px] bg-gradient-to-r from-transparent via-[#C5A77B]/40 to-transparent mt-4 mb-1" />
         </div>
 
         {/* Navigation Items */}
-        <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto">
+        <nav className="flex-1 px-3 py-2 space-y-1.5 overflow-y-auto min-h-0 custom-nav-scrollbar">
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
             return (
@@ -91,49 +96,73 @@ export const Sidebar = ({ mobileOpen, setMobileOpen }) => {
                 to={item.path}
                 onClick={() => setMobileOpen && setMobileOpen(false)}
                 className={({ isActive }) => `
-                  flex items-center justify-between px-3 py-2 text-xs font-medium rounded-xl transition-all duration-200 group
+                  flex items-center gap-3.5 px-4 py-2.5 rounded-full transition-all duration-200 font-sans text-sm font-medium
                   ${isActive
-                    ? 'bg-gradient-to-r from-sky-500/20 via-sky-500/10 to-rose-500/10 border border-sky-400/40 text-sky-200 shadow-[0_0_15px_rgba(14,165,233,0.25)]'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] border border-transparent'
+                    ? 'bg-[#294D6B] text-[#E8E4DC] shadow-[0_2px_12px_rgba(23,45,70,0.5)] border border-[#8FAFC4]/30'
+                    : 'text-[#8FAFC4] hover:text-[#E8E4DC] hover:bg-white/[0.06]'
                   }
                 `}
               >
-                <div className="flex items-center gap-3">
-                  <Icon className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110 group-hover:text-sky-300" />
-                  <span className="truncate">{item.label}</span>
-                </div>
-                {item.badge && (
-                  <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-md bg-white/[0.06] text-slate-300 border border-white/10">
-                    {item.badge}
-                  </span>
-                )}
+                <Icon className="w-5 h-5 shrink-0 transition-transform group-hover:scale-105" />
+                <span className="truncate tracking-wide">{item.label}</span>
               </NavLink>
             );
           })}
+
+          {/* Logout Button */}
+          <button
+            onClick={logout}
+            className="w-full flex items-center gap-3.5 px-4 py-2.5 rounded-full text-[#8FAFC4] hover:text-[#E8E4DC] hover:bg-white/[0.06] transition-all font-sans text-sm font-medium mt-3"
+          >
+            <LogOut className="w-5 h-5 shrink-0" />
+            <span className="truncate tracking-wide">Logout</span>
+          </button>
         </nav>
 
-        {/* User Identity & Clearance Badge */}
-        <div className="p-3 border-t border-white/10 bg-black/40 backdrop-blur-xl">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-sky-950 to-rose-950 border border-sky-400/40 text-sky-300 font-bold text-xs flex items-center justify-center shadow-[0_0_10px_rgba(14,165,233,0.3)]">
-                {currentUser?.avatar || 'AU'}
-              </div>
-              <div className="overflow-hidden">
-                <p className="text-xs font-semibold text-slate-200 truncate">{currentUser?.name}</p>
-                <p className="text-[10px] text-sky-400 truncate font-mono">{currentUser?.title}</p>
-              </div>
+        {/* Bottom Section: Cursive Quote & Layered Ocean Waves */}
+        <div className="relative pt-3 pb-0 text-center shrink-0">
+          {/* Cursive Quote in Antique Gold */}
+          <div className="px-6 pb-2">
+            <p className="font-script text-2xl sm:text-[26px] text-[#C5A77B] leading-tight tracking-wide drop-shadow-2xs">
+              Every fragment<br />
+              brings us closer<br />
+              to the truth.
+            </p>
+            {/* Subtle Arc Line Flourish */}
+            <div className="mt-2 flex justify-center">
+              <svg width="100" height="12" viewBox="0 0 100 12" fill="none">
+                <path d="M10 2 Q50 14 90 2" stroke="#C5A77B" strokeWidth="1" strokeOpacity="0.45" strokeLinecap="round" />
+              </svg>
             </div>
-            <button
-              onClick={logout}
-              title="Sign Out of Authority Terminal"
-              className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
           </div>
-          <div className="text-[9px] font-mono text-slate-400 bg-black/50 px-2 py-1 rounded-md border border-white/10 text-center truncate shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)]">
-            {currentUser?.clearance}
+
+          {/* Overlapping Layered Ocean Waves in Midnight Trust Tones */}
+          <div className="w-full h-14 overflow-hidden relative mt-1">
+            <svg
+              className="w-full h-full absolute bottom-0 left-0"
+              viewBox="0 0 256 56"
+              fill="none"
+              preserveAspectRatio="none"
+            >
+              {/* Back Wave */}
+              <path
+                d="M0 34 C60 18 120 48 180 28 C215 16 240 32 256 24 L256 56 L0 56 Z"
+                fill="#1B3550"
+                opacity="0.8"
+              />
+              {/* Mid Wave */}
+              <path
+                d="M0 40 C50 26 110 46 170 32 C210 22 240 38 256 32 L256 56 L0 56 Z"
+                fill="#244563"
+                opacity="0.7"
+              />
+              {/* Front Wave */}
+              <path
+                d="M0 46 C70 34 140 50 200 40 C230 34 250 44 256 40 L256 56 L0 56 Z"
+                fill="#294D6B"
+                opacity="0.6"
+              />
+            </svg>
           </div>
         </div>
       </aside>

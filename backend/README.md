@@ -28,7 +28,7 @@ This directory contains the production FastAPI backend for **Fragment First**.
 - `AuditLog`: Action logs for audit trails.
 
 ### 4. `app/services/`
-- **`llm_service.py`**: Reusable Gemini API client with graceful fallback to labeled Demo Mode, JSON response sanitization, and exponential retries.
+- **`llm_service.py`**: Prune-routed Gemini-compatible client with graceful fallback to labeled Demo Mode, JSON response sanitization, and exponential retries.
 - **`reconstruction_service.py`**: Trauma-informed narrative synthesis preserving uncertainty and identifying unclear fragments.
 - **`claim_service.py`**: Atomic fact extractor that parses entities without converting assumptions into facts.
 - **`verification_service.py`**: Objective claim verification comparing claims against supplied evidence records.
@@ -55,3 +55,7 @@ python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```powershell
 pytest tests/ -v
 ```
+
+For live LLM requests, save the provider key in Prune and set the gateway key in
+`PRUNE_API_KEY`. Keep `DEMO_MODE=false` when using the gateway. The local `.env`
+file is ignored by Git.

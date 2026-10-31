@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     
     # LLM Settings
     GEMINI_API_KEY: Union[str, None] = None
+    PRUNE_API_KEY: Union[str, None] = None
     LLM_PROVIDER: str = "gemini"
     DEMO_MODE: bool = True
     

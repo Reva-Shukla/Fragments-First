@@ -113,6 +113,47 @@ def test_missing_token_rejection(client):
     assert "Not authenticated" in resp.json()["detail"]
 
 
+def test_invalid_token_rejection(client):
+    """Verifies that malformed JWTs are rejected with 401."""
+    resp = client.get(
+        "/api/auth/me",
+        headers={"Authorization": "Bearer not-a-valid-jwt"}
+    )
+    assert resp.status_code == 401
+    assert "Could not validate credentials" in resp.json()["detail"]
+
+
+def test_inactive_user_rejection(client, victim_token):
+    """Verifies that a valid token cannot authenticate an inactive user."""
+    from app.database.session import SessionLocal
+    from app.models.user import User
+
+    db = SessionLocal()
+    try:
+        user = db.query(User).filter(User.email == "victim_test@example.com").first()
+        assert user is not None
+        user.is_active = False
+        db.commit()
+    finally:
+        db.close()
+
+    try:
+        resp = client.get(
+            "/api/auth/me",
+            headers={"Authorization": f"Bearer {victim_token}"}
+        )
+        assert resp.status_code == 401
+    finally:
+        db = SessionLocal()
+        try:
+            user = db.query(User).filter(User.email == "victim_test@example.com").first()
+            assert user is not None
+            user.is_active = True
+            db.commit()
+        finally:
+            db.close()
+
+
 def test_expired_token_rejection(client):
     """Verifies that expired JWT tokens are rejected with 401."""
     from datetime import timedelta

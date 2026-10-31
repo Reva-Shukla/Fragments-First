@@ -37,7 +37,7 @@ export const RootCauseAnalysis = () => {
     name: `Hypothesis #${hyp.rank}`,
     title: hyp.title.length > 25 ? hyp.title.slice(0, 25) + '...' : hyp.title,
     probability: hyp.probabilityScore,
-    color: hyp.rank === 1 ? '#0ea5e9' : hyp.rank === 2 ? '#ff007f' : '#0284c7'
+    color: hyp.rank === 1 ? '#294D6B' : hyp.rank === 2 ? '#C5A77B' : '#8FAFC4'
   }));
 
   return (
@@ -45,20 +45,20 @@ export const RootCauseAnalysis = () => {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-white tracking-tight">Root Cause Analysis & Hypothesis Ranking</h1>
-            <span className="px-2.5 py-0.5 rounded-full bg-sky-950/40 border border-sky-400/40 text-sky-300 font-mono text-[10px] shadow-[0_0_10px_rgba(14,165,233,0.3)]">
+          <div className="flex items-center gap-2.5">
+            <h1 className="font-serif-clean text-2xl font-bold text-[#172D46] tracking-tight">Root Cause Analysis & Hypothesis Ranking</h1>
+            <span className="px-2.5 py-0.5 rounded-full bg-[#EAF1F7] border border-[#294D6B]/30 text-[#294D6B] font-mono text-[10px] font-semibold">
               MULTI-HYPOTHESIS ENGINE
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
-            Case Ref: <span className="text-sky-300 font-mono font-medium">{currentCase.id}</span> • Probabilistic weighting of competing investigative hypotheses
+          <p className="text-xs text-[#5E7A91] mt-1">
+            Case Ref: <span className="text-[#294D6B] font-mono font-medium">{currentCase.id}</span> • Probabilistic weighting of competing investigative hypotheses
           </p>
         </div>
 
         {/* Primary Determination Badge */}
-        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-sky-950/40 border border-sky-400/50 text-xs text-sky-300 font-mono shadow-[0_0_15px_rgba(14,165,233,0.25)]">
-          <CheckCircle2 className="w-4 h-4 text-sky-400 drop-shadow-[0_0_6px_rgba(14,165,233,0.8)]" />
+        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#EAF1F7] border border-[#294D6B]/30 text-xs text-[#294D6B] font-mono shadow-xs font-semibold">
+          <CheckCircle2 className="w-4 h-4 text-[#294D6B]" />
           <span>PRIMARY FINDING: RANK #1 (92% FORENSIC CERTAINTY)</span>
         </div>
       </div>
@@ -66,27 +66,27 @@ export const RootCauseAnalysis = () => {
       <EthicalNoticeBanner />
 
       {/* Comparative Probability Bar Chart */}
-      <div className="bg-black/60 backdrop-blur-2xl border border-white/10 rounded-2xl p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.6)] relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-sky-400/30 to-rose-400/30" />
+      <div className="bg-[#FCFBF9] border border-[#D8D2C6] rounded-2xl p-6 shadow-xs relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#C5A77B]/40 to-transparent" />
 
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-sm font-semibold text-white">Hypothesis Corroboration Comparison</h2>
-            <p className="text-xs text-slate-400">Probabilistic weight assigned by physical telemetry and corroboration matrices</p>
+            <h2 className="font-serif-clean text-base font-bold text-[#172D46]">Hypothesis Corroboration Comparison</h2>
+            <p className="text-xs text-[#5E7A91]">Probabilistic weight assigned by physical telemetry and corroboration matrices</p>
           </div>
         </div>
 
         <div className="h-44 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
-              <XAxis type="number" domain={[0, 100]} stroke="#64748b" fontSize={11} unit="%" />
-              <YAxis dataKey="name" type="category" stroke="#64748b" fontSize={11} width={90} />
+              <XAxis type="number" domain={[0, 100]} stroke="#5E7A91" fontSize={11} unit="%" />
+              <YAxis dataKey="name" type="category" stroke="#5E7A91" fontSize={11} width={90} />
               <Tooltip
                 contentStyle={{ 
-                  backgroundColor: 'rgba(3, 7, 18, 0.9)', 
-                  borderColor: 'rgba(255, 255, 255, 0.15)', 
+                  backgroundColor: '#172D46', 
+                  borderColor: '#C5A77B', 
                   borderRadius: '12px', 
-                  backdropFilter: 'blur(16px)',
+                  color: '#FCFBF9',
                   fontSize: '12px' 
                 }}
                 formatter={(val) => [`${val}% Probability`, 'Forensic Score']}
@@ -110,41 +110,41 @@ export const RootCauseAnalysis = () => {
             <div
               key={hyp.id}
               onClick={() => setSelectedHypothesis(hyp)}
-              className={`bg-black/60 backdrop-blur-2xl border rounded-2xl p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.6)] transition-all cursor-pointer relative overflow-hidden group ${
+              className={`bg-[#FCFBF9] border rounded-2xl p-6 shadow-xs transition-all cursor-pointer relative overflow-hidden group ${
                 isSelected
-                  ? 'border-sky-400/70 shadow-[0_0_25px_rgba(14,165,233,0.25)]'
-                  : 'border-white/10 hover:border-white/20'
+                  ? 'border-2 border-[#294D6B] shadow-md bg-[#FAF9F5]'
+                  : 'border-[#D8D2C6] hover:border-[#294D6B]'
               }`}
             >
-              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#C5A77B]/40 to-transparent" />
 
               {/* Header row */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b border-white/10 mb-3">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b border-[#D8D2C6]/70 mb-3">
                 <div className="flex items-center gap-3">
                   <span className={`w-8 h-8 rounded-xl flex items-center justify-center font-mono font-bold text-xs ${
                     hyp.rank === 1
-                      ? 'bg-sky-500/20 text-sky-300 border border-sky-400/50 shadow-[0_0_12px_rgba(14,165,233,0.3)]'
-                      : 'bg-white/[0.04] text-slate-400 border border-white/10'
+                      ? 'bg-[#294D6B] text-white shadow-xs'
+                      : 'bg-white text-[#5E7A91] border border-[#D8D2C6]'
                   }`}>
                     #{hyp.rank}
                   </span>
                   <div>
-                    <h3 className="text-sm font-semibold text-white">{hyp.title}</h3>
-                    <span className="text-[11px] text-sky-400 font-mono">Category: {hyp.category}</span>
+                    <h3 className="text-sm font-bold text-[#172D46]">{hyp.title}</h3>
+                    <span className="text-[11px] text-[#294D6B] font-mono font-medium">Category: {hyp.category}</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3 self-end sm:self-auto">
                   <div className="text-right">
-                    <span className="text-[10px] text-slate-400 font-mono block">PROBABILITY</span>
-                    <span className={`text-base font-bold font-mono ${hyp.rank === 1 ? 'text-sky-300' : 'text-rose-400'}`}>
+                    <span className="text-[10px] text-[#5E7A91] font-mono block">PROBABILITY</span>
+                    <span className={`text-base font-bold font-mono ${hyp.rank === 1 ? 'text-[#294D6B]' : 'text-[#8E6E3C]'}`}>
                       {hyp.probabilityScore}%
                     </span>
                   </div>
                   <span className={`px-3 py-1 rounded-xl text-xs font-mono font-medium border ${
                     hyp.rank === 1
-                      ? 'bg-sky-950/40 text-sky-300 border-sky-400/50 shadow-[0_0_10px_rgba(14,165,233,0.25)]'
-                      : 'bg-white/[0.04] text-slate-300 border-white/10'
+                      ? 'bg-[#EAF1F7] text-[#294D6B] border-[#294D6B]/30'
+                      : 'bg-white text-[#5E7A91] border-[#D8D2C6]'
                   }`}>
                     {hyp.confidenceLevel}
                   </span>
@@ -154,15 +154,15 @@ export const RootCauseAnalysis = () => {
               {/* Supporting vs Contradicting Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
                 {/* Supporting */}
-                <div className="p-4 bg-white/[0.02] border border-white/10 rounded-xl">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-sky-400 mb-2">
-                    <CheckCircle2 className="w-4 h-4 shrink-0 drop-shadow-[0_0_6px_rgba(14,165,233,0.8)]" />
+                <div className="p-4 bg-white border border-[#D8D2C6] rounded-xl shadow-xs">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#294D6B] mb-2">
+                    <CheckCircle2 className="w-4 h-4 shrink-0 text-[#294D6B]" />
                     <span>Supporting Evidence & Corroborating Logs</span>
                   </div>
-                  <ul className="space-y-1.5 text-xs text-slate-300">
+                  <ul className="space-y-1.5 text-xs text-[#233B54] font-reading">
                     {hyp.supportingEvidence.map((ev, i) => (
                       <li key={i} className="flex items-start gap-2">
-                        <span className="text-sky-400 mt-1">•</span>
+                        <span className="text-[#294D6B] mt-1 font-bold">•</span>
                         <span className="leading-relaxed">{ev}</span>
                       </li>
                     ))}
@@ -170,21 +170,21 @@ export const RootCauseAnalysis = () => {
                 </div>
 
                 {/* Contradicting */}
-                <div className="p-4 bg-white/[0.02] border border-white/10 rounded-xl">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-rose-400 mb-2">
-                    <XCircle className="w-4 h-4 shrink-0 drop-shadow-[0_0_6px_rgba(255,0,127,0.8)]" />
+                <div className="p-4 bg-white border border-[#D8D2C6] rounded-xl shadow-xs">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#9B2C2C] mb-2">
+                    <XCircle className="w-4 h-4 shrink-0 text-[#9B2C2C]" />
                     <span>Contradicting Facts & Refutations</span>
                   </div>
-                  <ul className="space-y-1.5 text-xs text-slate-300">
+                  <ul className="space-y-1.5 text-xs text-[#233B54] font-reading">
                     {hyp.contradictingEvidence.length > 0 ? (
                       hyp.contradictingEvidence.map((ev, i) => (
                         <li key={i} className="flex items-start gap-2">
-                          <span className="text-rose-400 mt-1">•</span>
+                          <span className="text-[#9B2C2C] mt-1 font-bold">•</span>
                           <span className="leading-relaxed">{ev}</span>
                         </li>
                       ))
                     ) : (
-                      <li className="text-slate-500 italic text-[11px]">No contradictory evidence identified</li>
+                      <li className="text-[#8FAFC4] italic text-[11px]">No contradictory evidence identified</li>
                     )}
                   </ul>
                 </div>
@@ -192,30 +192,30 @@ export const RootCauseAnalysis = () => {
 
               {/* Missing Info & Uncertainty */}
               <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                <div className="p-3 bg-rose-950/20 border border-rose-500/40 rounded-xl text-rose-300/90 shadow-[0_0_12px_rgba(255,0,127,0.15)]">
-                  <span className="font-semibold block font-mono text-[10px] uppercase mb-1">
+                <div className="p-3 bg-[#FAF6EF] border border-[#C5A77B]/50 rounded-xl text-[#8E6E3C] shadow-xs">
+                  <span className="font-bold block font-mono text-[10px] uppercase mb-1 text-[#8E6E3C]">
                     Missing Information Required to Formally Close:
                   </span>
-                  <ul className="space-y-1 text-[11px]">
+                  <ul className="space-y-1 text-[11px] text-[#5B4727]">
                     {hyp.missingInformation.map((gap, i) => (
                       <li key={i} className="flex items-start gap-1.5">
-                        <span className="text-rose-400 font-bold">-</span>
+                        <span className="text-[#C5A77B] font-bold">-</span>
                         <span>{gap}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                <div className="p-3 bg-black/40 border border-white/10 rounded-xl space-y-1.5">
+                <div className="p-3 bg-white border border-[#D8D2C6] rounded-xl space-y-1.5 shadow-xs">
                   <div className="flex items-center justify-between text-[11px] font-mono">
-                    <span className="text-slate-400">Uncertainty Margin:</span>
-                    <span className="text-slate-200 font-semibold">{hyp.uncertaintyRating}</span>
+                    <span className="text-[#5E7A91]">Uncertainty Margin:</span>
+                    <span className="text-[#172D46] font-semibold">{hyp.uncertaintyRating}</span>
                   </div>
-                  <div className="border-t border-white/10 pt-1.5">
-                    <span className="text-[10px] font-mono text-sky-400 block mb-1">SOURCE REFERENCES:</span>
+                  <div className="border-t border-[#D8D2C6]/60 pt-1.5">
+                    <span className="text-[10px] font-mono text-[#294D6B] block mb-1 font-semibold">SOURCE REFERENCES:</span>
                     <div className="flex flex-wrap gap-1">
                       {hyp.sourceReferences.map((ref, i) => (
-                        <span key={i} className="px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/10 text-[10px] font-mono text-slate-300">
+                        <span key={i} className="px-2 py-0.5 rounded-md bg-[#EAF1F7] border border-[#294D6B]/20 text-[10px] font-mono text-[#294D6B] font-medium">
                           {ref}
                         </span>
                       ))}

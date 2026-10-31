@@ -1,5 +1,5 @@
 from datetime import datetime, timezone, timedelta
-from typing import Optional, List, Any
+from typing import Any, List, Optional
 import bcrypt
 import jwt
 from fastapi import Depends, HTTPException, status
@@ -7,6 +7,8 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
+from app.database.session import get_db
+from app.models.user import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/token")
 
@@ -53,15 +55,10 @@ def decode_access_token(token: str) -> Optional[dict]:
 
 
 def get_current_user(
-    token: str = Depends(oauth2_scheme)
-):
-    """
-    Decodes token and returns current user model.
-    Note: Circular import resolved by importing inside function or using dependency injection.
-    """
-    from app.database.session import get_db
-    from app.models.user import User
-
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+) -> User:
+    """Decode a bearer token and return its active database user."""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -71,20 +68,14 @@ def get_current_user(
     if payload is None:
         raise credentials_exception
     
-    email: str = payload.get("sub")
-    if email is None:
+    email = payload.get("sub")
+    if not isinstance(email, str) or not email:
         raise credentials_exception
 
-    # Need DB session
-    from app.database.session import SessionLocal
-    local_db = SessionLocal()
-    try:
-        user = local_db.query(User).filter(User.email == email).first()
-        if user is None:
-            raise credentials_exception
-        return user
-    finally:
-        local_db.close()
+    user = db.query(User).filter(User.email == email).first()
+    if user is None or not user.is_active:
+        raise credentials_exception
+    return user
 
 
 def require_roles(allowed_roles: List[str]):

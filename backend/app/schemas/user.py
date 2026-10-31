@@ -17,6 +17,15 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str = Field(..., min_length=6, description="User password (minimum 6 characters)")
+    # username: pseudonymous display identity chosen at registration.
+    # Optional to maintain backward compatibility with existing integrations;
+    # the register route will enforce uniqueness when provided.
+    username: Optional[str] = Field(
+        None,
+        min_length=2,
+        max_length=50,
+        description="Chosen display alias (pseudonymous username). Must be unique.",
+    )
 
 
 class UserLogin(BaseModel):
@@ -26,6 +35,7 @@ class UserLogin(BaseModel):
 
 class UserResponse(UserBase):
     id: int
+    username: Optional[str] = None
     is_active: bool
     created_at: datetime
     updated_at: datetime
@@ -42,3 +52,9 @@ class TokenResponse(BaseModel):
 class TokenData(BaseModel):
     email: Optional[str] = None
     role: Optional[str] = None
+
+
+class UsernameAvailability(BaseModel):
+    username: str
+    available: bool
+    message: str

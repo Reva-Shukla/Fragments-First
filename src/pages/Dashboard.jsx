@@ -3,17 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Briefcase, 
   Clock, 
-  FileCheck, 
   CheckCircle2, 
-  AlertTriangle, 
-  ShieldAlert, 
-  ArrowUpRight, 
   Activity, 
-  FileText, 
-  Database,
-  Search,
-  ExternalLink,
-  ChevronRight
+  ArrowUpRight, 
+  ChevronRight,
+  PieChart as PieIcon,
+  BarChart3,
+  Edit3,
+  ArrowRight
 } from 'lucide-react';
 import { 
   ResponsiveContainer, 
@@ -43,16 +40,16 @@ export const Dashboard = () => {
   const verificationCount = cases.filter(c => c.status === 'Verification Phase').length;
   const completedCount = cases.filter(c => c.status === 'Completed').length;
 
-  // Chart data: Evidence types in liquid glass cerulean & neon rose palette
+  // Chart data: Evidence types in strict Midnight Trust palette
   const evidenceTypeData = [
-    { name: 'CCTV / Video', count: 12, color: '#00f0ff', grad: 'url(#cctvPieGrad)' },
-    { name: '911 / Radio Audio', count: 8, color: '#38bdf8', grad: 'url(#audioPieGrad)' },
-    { name: 'CAD / Sensor SCADA', count: 15, color: '#ff007f', grad: 'url(#cadPieGrad)' },
-    { name: 'Medical / ER HL7', count: 4, color: '#0ea5e9', grad: 'url(#medicalPieGrad)' },
-    { name: 'Forensic Reports', count: 6, color: '#f43f5e', grad: 'url(#forensicPieGrad)' }
+    { name: 'CAD / Sensor SCADA', count: 15, color: '#294D6B' }, // Steel Blue
+    { name: 'CCTV / Video Streams', count: 12, color: '#C5A77B' }, // Antique Gold
+    { name: '911 / Radio Audio', count: 8, color: '#8FAFC4' },    // Muted Blue
+    { name: 'Forensic Records', count: 6, color: '#172D46' },     // Midnight Navy
+    { name: 'Medical / ER HL7', count: 4, color: '#416B8E' }      // Supporting Slate Steel
   ];
 
-  // Chart data: Verification throughput (Cerulean Corroborated vs Neon Rose Discrepancies)
+  // Chart data: Verification throughput (Steel Blue Corroborated vs Antique Gold Discrepancies)
   const verificationThroughput = [
     { day: 'Mon', claimsCorroborated: 8, discrepancies: 2 },
     { day: 'Tue', claimsCorroborated: 12, discrepancies: 4 },
@@ -64,51 +61,105 @@ export const Dashboard = () => {
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Top Banner - Cyberpunk Liquid Glass HUD Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
-              <span>Authority Investigation</span>
-              <span className="text-[#00e5ff] drop-shadow-[0_0_12px_rgba(0,229,255,0.8)]">Dashboard</span>
+    <div className="space-y-6 max-w-7xl mx-auto pb-10">
+      {/* Hero Banner Card: Replaces Image 2 with Image 1 layout & Image 3 Puzzle Mind artwork */}
+      <div className="relative overflow-hidden rounded-3xl bg-[#fbf9f4] border border-[#D8D2C6] shadow-[0_6px_30px_rgba(23,45,70,0.06)] flex flex-col md:flex-row items-stretch min-h-[280px] sm:min-h-[310px]">
+        {/* Subtle Ambient Light Orbs */}
+        <div className="pointer-events-none absolute -top-16 -left-16 w-56 h-56 rounded-full bg-[#C5A77B]/15 blur-3xl" />
+
+        {/* Left Side: Brand Typography, Tagline, Body & Action Buttons */}
+        <div className="flex-1 p-6 sm:p-8 lg:p-10 z-10 flex flex-col justify-between relative bg-gradient-to-r from-[#fbf9f4] via-[#fbf9f4] to-[#fbf9f4]/95 md:to-transparent">
+          <div>
+            {/* Title matching Image 4 lettering */}
+            <h1 className="font-brand text-3xl sm:text-4xl lg:text-5xl font-bold text-[#172D46] tracking-tight leading-tight">
+              Fragments First
             </h1>
-            <span className="px-3 py-1 rounded-full bg-[#03142e]/90 border border-[#00f0ff]/60 text-[#00f0ff] font-mono text-[10px] font-bold tracking-widest shadow-[0_0_14px_rgba(0,240,255,0.4),inset_0_0_8px_rgba(0,240,255,0.2)] flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#00f0ff] animate-pulse shadow-[0_0_8px_#00f0ff]" />
-              ONLINE
-            </span>
+
+            {/* Italic Tagline matching Images 2 & 3 */}
+            <p className="font-brand italic text-lg sm:text-xl text-[#294D6B] mt-1.5 font-medium tracking-wide">
+              Report. Reconstruct. Resolve.
+            </p>
+
+            {/* Antique Gold Hairline Divider */}
+            <div className="w-16 h-[2px] bg-[#C5A77B] my-3.5" />
+
+            {/* Description Text */}
+            <p className="font-sans text-xs sm:text-sm text-[#5E7A91] leading-relaxed max-w-md font-medium">
+              Together, let's turn fragmented information into clarity and justice.
+            </p>
           </div>
-          <p className="text-xs text-slate-400 mt-1 flex items-center gap-2 flex-wrap">
-            <span>Logged in as</span>
-            <span className="text-sky-200 font-semibold drop-shadow-[0_0_6px_rgba(56,189,248,0.4)]">{currentUser?.name}</span>
-            <span className="text-slate-400">({currentUser?.title}) • {currentUser?.agency}</span>
-            <span className="px-2 py-0.5 rounded-md bg-[#051329] border border-[#0e274c] text-[10px] font-mono text-sky-400/80">
-              SECURE CLEARANCE // LEVEL-4
-            </span>
-          </p>
+
+          {/* Action Buttons matching Image 3 with Steel Blue primary pill */}
+          <div className="mt-6 flex items-center gap-3.5 flex-wrap">
+            {/* Main Pill Button */}
+            <button
+              onClick={() => navigate('/cases')}
+              className="px-5 py-2.5 rounded-full bg-[#294D6B] hover:bg-[#172D46] text-[#E8E4DC] font-sans text-xs sm:text-sm font-semibold flex items-center gap-2.5 shadow-[0_4px_16px_rgba(41,77,107,0.3)] hover:shadow-[0_6px_22px_rgba(23,45,70,0.4)] transition-all hover:-translate-y-0.5"
+            >
+              <Edit3 className="w-4 h-4 text-[#8FAFC4]" />
+              <span>Report an Incident</span>
+              <ArrowRight className="w-4 h-4 text-[#E8E4DC]" />
+            </button>
+
+            {/* Secondary Claims Button */}
+            <button
+              onClick={() => navigate('/claim-verification')}
+              className="px-4 py-2.5 rounded-full bg-white/90 hover:bg-white text-[#294D6B] hover:text-[#172D46] font-sans text-xs sm:text-sm font-semibold border border-[#D8D2C6] hover:border-[#294D6B] transition-all shadow-xs"
+            >
+              Review Claims
+            </button>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2.5">
-          <button
-            onClick={() => navigate('/claim-verification')}
-            className="px-4 py-2 bg-gradient-to-r from-[#00d2ff] via-[#0088ff] to-[#ff007f] hover:from-[#38bdf8] hover:to-[#ff2d78] text-white font-semibold text-xs rounded-xl flex items-center gap-2 shadow-[0_0_24px_rgba(0,210,255,0.4),inset_0_1px_1.5px_rgba(255,255,255,0.5)] hover:shadow-[0_0_32px_rgba(255,0,127,0.5)] transition-all hover:scale-105 active:scale-95"
-          >
-            <span>Review Claims</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
-          <button
-            onClick={() => navigate('/reports')}
-            className="px-4 py-2 bg-[#04091a]/90 hover:bg-sky-500/20 text-slate-200 hover:text-white font-medium text-xs rounded-xl border border-[#0e274c] hover:border-sky-400/50 transition-all shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_0_16px_rgba(0,0,0,0.6)]"
-          >
-            Export Dossier
-          </button>
+        {/* Right Side: Image 3 (Puzzle Mind Silhouette) with Sweeping Wave Gradient Transitions */}
+        <div className="md:w-5/12 lg:w-1/2 relative min-h-[220px] md:min-h-full overflow-hidden bg-[#061833]">
+          {/* Glowing blue background backlight for Image 3 */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-[#021833] via-[#092c5a] to-[#04152d]" />
+
+          {/* The Puzzle Mind Image (Image 3) */}
+          <img
+            src="/hero-puzzle-head.png"
+            alt="Fragments First - Puzzle Mind Reconstruction"
+            className="w-full h-full object-cover object-center relative z-0 opacity-95 transition-transform duration-700 hover:scale-105"
+          />
+
+          {/* Radial Sea-Blue Glow around the puzzle silhouette */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_60%_45%,rgba(14,165,233,0.3)_0%,transparent_65%)] pointer-events-none z-10" />
+
+          {/* Sweeping Smooth Transition Gradient from Left into Image */}
+          <div className="absolute inset-y-0 left-0 w-36 bg-gradient-to-r from-[#fbf9f4] via-[#fbf9f4]/80 to-transparent pointer-events-none hidden md:block z-10" />
+
+          {/* Curved Wave Ribbons bridging cream text area to the glowing blue artwork */}
+          <div className="absolute inset-y-0 left-0 w-28 pointer-events-none hidden md:block z-20">
+            <svg className="h-full w-full" viewBox="0 0 100 300" preserveAspectRatio="none" fill="none">
+              {/* Primary Cream Curve */}
+              <path
+                d="M0 0 L55 0 C30 90 85 190 35 300 L0 300 Z"
+                fill="#fbf9f4"
+              />
+              {/* Semi-transparent Sea Blue Wave Layer */}
+              <path
+                d="M55 0 C30 90 85 190 35 300 C55 210 15 95 75 0 Z"
+                fill="rgba(2, 132, 199, 0.15)"
+              />
+              {/* Subtle Ambient Golden Sun Wave Line */}
+              <path
+                d="M58 0 C32 92 88 192 38 300"
+                stroke="rgba(213, 170, 85, 0.3)"
+                strokeWidth="1.5"
+              />
+            </svg>
+          </div>
+
+          {/* Subtle bottom edge vignette */}
+          <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-black/30 to-transparent pointer-events-none z-10" />
         </div>
       </div>
 
-      {/* Ethical Notice Banner */}
+      {/* Reassuring Ethical Notice Banner */}
       <EthicalNoticeBanner />
 
-      {/* Metric Indicators */}
+      {/* 4 Stat Metric Indicators */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
           title="Assigned Cases"
@@ -121,18 +172,18 @@ export const Dashboard = () => {
         <MetricCard
           title="Active Investigations"
           value={activeCount}
-          change="2 high priority"
+          change="2 priority cases"
           trend="up"
           icon={Activity}
-          subtitle="Active sensor & timeline synthesis"
+          subtitle="Sensor telemetry & timeline sync"
         />
         <MetricCard
           title="Pending Reviews"
           value={verificationCount + 1}
-          change="3 awaiting concurrence"
+          change="3 in queue"
           trend="down"
           icon={Clock}
-          subtitle="Statement diff & claim verification"
+          subtitle="Statement diff & corroboration"
         />
         <MetricCard
           title="Completed Inquiries"
@@ -140,378 +191,201 @@ export const Dashboard = () => {
           change="100% custody sealed"
           trend="up"
           icon={CheckCircle2}
-          subtitle="Signed and submitted for legal review"
+          subtitle="Legally verified & closed"
         />
       </div>
 
-      {/* Analytics & Distribution Visualizers */}
+      {/* Analytics & Data Distribution with Midnight Trust palette */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Global SVG Definitions for Liquid Gradients */}
-        <svg width="0" height="0" className="absolute w-0 h-0 pointer-events-none" aria-hidden="true">
-          <defs>
-            {/* Corroborated Liquid Cyan Gradient */}
-            <linearGradient id="corroboratedGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#00f0ff" stopOpacity={1} />
-              <stop offset="25%" stopColor="#0095ff" stopOpacity={0.9} />
-              <stop offset="70%" stopColor="#0044cc" stopOpacity={0.75} />
-              <stop offset="100%" stopColor="#041a4a" stopOpacity={0.6} />
-            </linearGradient>
-
-            {/* Discrepancy Liquid Rose Gradient */}
-            <linearGradient id="discrepancyGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#ff007f" stopOpacity={1} />
-              <stop offset="35%" stopColor="#d6006c" stopOpacity={0.85} />
-              <stop offset="75%" stopColor="#800040" stopOpacity={0.7} />
-              <stop offset="100%" stopColor="#3d001e" stopOpacity={0.55} />
-            </linearGradient>
-
-            {/* Evidence Donut Segments Gradients */}
-            <linearGradient id="cctvPieGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#00f0ff" />
-              <stop offset="100%" stopColor="#0284c7" />
-            </linearGradient>
-            <linearGradient id="audioPieGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#38bdf8" />
-              <stop offset="100%" stopColor="#0369a1" />
-            </linearGradient>
-            <linearGradient id="cadPieGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#ff007f" />
-              <stop offset="100%" stopColor="#a20050" />
-            </linearGradient>
-            <linearGradient id="medicalPieGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#0ea5e9" />
-              <stop offset="100%" stopColor="#075985" />
-            </linearGradient>
-            <linearGradient id="forensicPieGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#f43f5e" />
-              <stop offset="100%" stopColor="#881337" />
-            </linearGradient>
-          </defs>
-        </svg>
-
-        {/* Verification Throughput Chart - Cyberpunk Liquid Glass HUD */}
-        <div className="lg:col-span-2 relative overflow-hidden rounded-2xl bg-[#040713]/95 backdrop-blur-2xl border border-[#0d274c]/80 p-6 shadow-[0_0_35px_rgba(0,180,255,0.14),0_12px_40px_rgba(0,0,0,0.9),inset_0_1px_1px_rgba(255,255,255,0.1)] group">
-          {/* Subtle Ambient Radial Backlight behind bars */}
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_75%,rgba(0,140,255,0.09)_0%,transparent_70%)]" />
-
-          {/* Top-Left Cyberpunk HUD Bracket */}
-          <div className="pointer-events-none absolute top-0 left-0 z-20">
-            <svg width="100" height="80" viewBox="0 0 100 80" fill="none">
-              {/* Outer cyan bracket with chamfer */}
-              <path
-                d="M 2 46 L 2 20 L 20 2 L 68 2"
-                stroke="#00f0ff"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                style={{ filter: 'drop-shadow(0 0 5px #00f0ff)' }}
-              />
-              {/* Inner diagonal notch */}
-              <line
-                x1="10"
-                y1="22"
-                x2="22"
-                y2="10"
-                stroke="#00f0ff"
-                strokeWidth="1.5"
-                strokeOpacity="0.75"
-              />
-            </svg>
-          </div>
-
-          {/* Bottom-Right Cyberpunk HUD Bracket & Vents */}
-          <div className="pointer-events-none absolute bottom-0 right-0 z-20">
-            <svg width="120" height="80" viewBox="0 0 120 80" fill="none">
-              {/* Outer rose bracket with chamfer */}
-              <path
-                d="M 15 78 L 98 78 L 118 58 L 118 28"
-                stroke="#ff007f"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                style={{ filter: 'drop-shadow(0 0 5px #ff007f)' }}
-              />
-              {/* 3 Diagonal Vents / Slashes /// */}
-              <line x1="72" y1="74" x2="80" y2="66" stroke="#ff007f" strokeWidth="2.5" strokeLinecap="round" />
-              <line x1="81" y1="74" x2="89" y2="66" stroke="#ff007f" strokeWidth="2.5" strokeLinecap="round" />
-              <line x1="90" y1="74" x2="98" y2="66" stroke="#ff007f" strokeWidth="2.5" strokeLinecap="round" />
-            </svg>
-          </div>
-
-          {/* Card Header: Icon, Dual-Color Title & Capsule Legend */}
-          <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-            <div className="flex items-center gap-3.5">
-              {/* Custom Cyber Neon Line/Bar Chart Icon */}
-              <div className="w-12 h-12 rounded-xl bg-[#031126] border border-[#00d2ff]/80 flex items-center justify-center shadow-[0_0_16px_rgba(0,210,255,0.4),inset_0_0_12px_rgba(0,210,255,0.25)] shrink-0">
-                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" style={{ filter: 'drop-shadow(0 0 5px rgba(0, 210, 255, 0.8))' }}>
-                  <rect x="3.5" y="13" width="3" height="7" rx="0.75" fill="#00d2ff" />
-                  <rect x="9.5" y="9.5" width="3" height="10.5" rx="0.75" fill="#00d2ff" />
-                  <rect x="15.5" y="6" width="3" height="14" rx="0.75" fill="#00d2ff" />
-                  <path
-                    d="M 3.5 14.5 L 9.5 10.5 L 14.5 12.5 L 20.5 6"
-                    stroke="#00d2ff"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M 16.5 6 H 20.5 V 10"
-                    stroke="#00d2ff"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div>
-
-              <div>
-                <h2 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-1.5">
-                  <span>Claim Corroboration</span>
-                  <span className="text-[#00e5ff] drop-shadow-[0_0_10px_rgba(0,229,255,0.8)]">Throughput</span>
-                </h2>
-                <p className="text-xs text-[#94a3b8] mt-0.5 font-normal">
-                  Daily volume of factual verifications and flagged timeline discrepancies
-                </p>
-              </div>
-            </div>
-
-            {/* Capsule Legend */}
-            <div className="flex items-center gap-5 px-4 py-2 rounded-full bg-[#050f24]/90 border border-[#0e3b6e]/70 shadow-[0_0_16px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.1)] self-start sm:self-auto">
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-[#00d2ff] shadow-[0_0_10px_#00d2ff]" />
-                <span className="text-xs font-medium text-[#38bdf8]">Corroborated</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-[#ff007f] shadow-[0_0_10px_#ff007f]" />
-                <span className="text-xs font-medium text-[#ff2d78]">Discrepancies</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Chart Canvas */}
-          <div className="relative z-10 h-72 sm:h-80 min-h-[280px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={verificationThroughput}
-                margin={{ top: 20, right: 15, left: -5, bottom: 10 }}
-                barGap={6}
-                barCategoryGap="24%"
-              >
-                <CartesianGrid
-                  strokeDasharray="4 4"
-                  stroke="#122749"
-                  vertical={false}
-                />
-
-                <XAxis
-                  dataKey="day"
-                  stroke="#00e5ff"
-                  tickLine={false}
-                  axisLine={{ stroke: '#00e5ff', strokeWidth: 1.5, strokeOpacity: 0.95 }}
-                  tick={{ fill: '#94a3b8', fontSize: 13, fontWeight: 500 }}
-                  dy={12}
-                />
-
-                <YAxis
-                  domain={[0, 20]}
-                  ticks={[0, 5, 10, 15, 20]}
-                  stroke="#00e5ff"
-                  tickLine={false}
-                  axisLine={{ stroke: '#00e5ff', strokeWidth: 1.5, strokeOpacity: 0.95 }}
-                  tick={{ fill: '#94a3b8', fontSize: 13, fontWeight: 500 }}
-                  dx={-8}
-                />
-
-                <Tooltip
-                  cursor={{ fill: 'rgba(0, 240, 255, 0.04)' }}
-                  contentStyle={{
-                    backgroundColor: 'rgba(4, 9, 24, 0.95)',
-                    borderColor: '#00d2ff',
-                    borderWidth: '1px',
-                    borderRadius: '12px',
-                    backdropFilter: 'blur(16px)',
-                    boxShadow: '0 0 20px rgba(0, 210, 255, 0.35)',
-                    fontSize: '12px',
-                    color: '#ffffff'
-                  }}
-                />
-
-                <Bar
-                  dataKey="claimsCorroborated"
-                  fill="url(#corroboratedGrad)"
-                  stroke="#00f0ff"
-                  strokeWidth={1.5}
-                  radius={[8, 8, 0, 0]}
-                  name="Corroborated"
-                  maxBarSize={32}
-                  style={{ filter: 'drop-shadow(0 0 8px rgba(0, 240, 255, 0.5))' }}
-                />
-
-                <Bar
-                  dataKey="discrepancies"
-                  fill="url(#discrepancyGrad)"
-                  stroke="#ff007f"
-                  strokeWidth={1.5}
-                  radius={[6, 6, 0, 0]}
-                  name="Discrepancies"
-                  maxBarSize={32}
-                  style={{ filter: 'drop-shadow(0 0 8px rgba(255, 0, 127, 0.5))' }}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Evidence Source Distribution - Cyberpunk Liquid Glass HUD */}
-        <div className="relative overflow-hidden rounded-2xl bg-[#040713]/95 backdrop-blur-2xl border border-[#0d274c]/80 p-6 shadow-[0_0_35px_rgba(255,0,127,0.14),0_12px_40px_rgba(0,0,0,0.9),inset_0_1px_1px_rgba(255,255,255,0.1)] group flex flex-col justify-between">
-          {/* Subtle Ambient Radial Backlight behind donut */}
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(255,0,127,0.08)_0%,transparent_70%)]" />
-
-          {/* Top-Left Cyberpunk HUD Bracket */}
-          <div className="pointer-events-none absolute top-0 left-0 z-20">
-            <svg width="100" height="80" viewBox="0 0 100 80" fill="none">
-              {/* Outer cyan bracket with chamfer */}
-              <path
-                d="M 2 46 L 2 20 L 20 2 L 68 2"
-                stroke="#00f0ff"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                style={{ filter: 'drop-shadow(0 0 5px #00f0ff)' }}
-              />
-              {/* Inner diagonal notch */}
-              <line
-                x1="10"
-                y1="22"
-                x2="22"
-                y2="10"
-                stroke="#00f0ff"
-                strokeWidth="1.5"
-                strokeOpacity="0.75"
-              />
-            </svg>
-          </div>
-
-          {/* Bottom-Right Cyberpunk HUD Bracket & Vents */}
-          <div className="pointer-events-none absolute bottom-0 right-0 z-20">
-            <svg width="120" height="80" viewBox="0 0 120 80" fill="none">
-              {/* Outer rose bracket with chamfer */}
-              <path
-                d="M 15 78 L 98 78 L 118 58 L 118 28"
-                stroke="#ff007f"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                style={{ filter: 'drop-shadow(0 0 5px #ff007f)' }}
-              />
-              {/* 3 Diagonal Vents / Slashes /// */}
-              <line x1="72" y1="74" x2="80" y2="66" stroke="#ff007f" strokeWidth="2.5" strokeLinecap="round" />
-              <line x1="81" y1="74" x2="89" y2="66" stroke="#ff007f" strokeWidth="2.5" strokeLinecap="round" />
-              <line x1="90" y1="74" x2="98" y2="66" stroke="#ff007f" strokeWidth="2.5" strokeLinecap="round" />
-            </svg>
-          </div>
-
+        {/* Verification Throughput Chart */}
+        <div className="lg:col-span-2 rounded-2xl bg-white/90 backdrop-blur-md border border-[#D8D2C6] p-6 shadow-[0_4px_20px_rgba(23,45,70,0.05)] flex flex-col justify-between">
           <div>
-            {/* Header: Icon, Dual-Color Title & Streams Badge */}
-            <div className="relative z-10 flex items-center justify-between gap-3 mb-4">
+            {/* Header with Title and Legend */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
               <div className="flex items-center gap-3">
-                {/* Cyber Neon Donut Chart Icon */}
-                <div className="w-12 h-12 rounded-xl bg-[#14061a] border border-[#ff007f]/80 flex items-center justify-center shadow-[0_0_16px_rgba(255,0,127,0.4),inset_0_0_12px_rgba(255,0,127,0.25)] shrink-0">
-                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" style={{ filter: 'drop-shadow(0 0 5px rgba(255, 0, 127, 0.8))' }}>
-                    <path
-                      d="M 21.2 15.8 A 10 10 0 1 1 8.2 2.8"
-                      stroke="#ff007f"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                    <path
-                      d="M 22 12 A 10 10 0 0 0 12 2 V 12 Z"
-                      fill="#ff007f"
-                      stroke="#ff007f"
-                      strokeWidth="1"
-                    />
-                  </svg>
+                <div className="w-10 h-10 rounded-xl bg-[#EAF1F7] border border-[#8FAFC4]/50 flex items-center justify-center text-[#294D6B] shadow-2xs">
+                  <BarChart3 className="w-5 h-5" />
                 </div>
-
                 <div>
-                  <h2 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-1.5">
-                    <span>Evidence</span>
-                    <span className="text-[#ff007f] drop-shadow-[0_0_10px_rgba(255,0,127,0.8)]">Distribution</span>
+                  <h2 className="font-serif-clean text-lg font-bold text-[#172D46] tracking-wide">
+                    Claim Corroboration Throughput
                   </h2>
-                  <p className="text-xs text-[#94a3b8] mt-0.5 font-normal">
-                    Ingested multi-agency evidentiary streams
+                  <p className="font-sans text-xs text-[#5E7A91] mt-0.5">
+                    Factual verifications and flagged discrepancies over time
                   </p>
                 </div>
               </div>
 
-              {/* Total Badge */}
-              <div className="px-3 py-1.5 rounded-full bg-[#120617]/90 border border-[#ff007f]/40 shadow-[0_0_12px_rgba(255,0,127,0.25),inset_0_1px_1px_rgba(255,255,255,0.1)] shrink-0 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#ff007f] shadow-[0_0_6px_#ff007f]" />
-                <span className="text-xs font-mono font-semibold text-rose-300">45 Streams</span>
+              {/* Legend with Midnight Trust contrast */}
+              <div className="flex items-center gap-4 px-4 py-1.5 rounded-full bg-[#F8F6F1] border border-[#D8D2C6] self-start sm:self-auto text-xs font-sans shadow-2xs">
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-[#294D6B] shadow-xs" />
+                  <span className="text-[#294D6B] font-bold">Corroborated</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-[#C5A77B] shadow-xs" />
+                  <span className="text-[#8E6E3C] font-bold">Discrepancies</span>
+                </div>
               </div>
             </div>
 
-            {/* Donut Chart Canvas with Center HUD Badge */}
-            <div className="relative z-10 h-52 sm:h-56 w-full flex items-center justify-center my-1">
+            {/* Chart Canvas */}
+            <div className="h-72 sm:h-80 min-h-[280px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={verificationThroughput}
+                  margin={{ top: 15, right: 15, left: -10, bottom: 5 }}
+                  barGap={6}
+                  barCategoryGap="28%"
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="#E2E8F0"
+                    vertical={false}
+                  />
+
+                  <XAxis
+                    dataKey="day"
+                    stroke="#294D6B"
+                    tickLine={false}
+                    axisLine={{ stroke: '#CBD5E1', strokeWidth: 1 }}
+                    tick={{ fill: '#172D46', fontSize: 12, fontWeight: 600, fontFamily: 'Inter, sans-serif' }}
+                    dy={10}
+                  />
+
+                  <YAxis
+                    domain={[0, 20]}
+                    ticks={[0, 5, 10, 15, 20]}
+                    stroke="#294D6B"
+                    tickLine={false}
+                    axisLine={{ stroke: '#CBD5E1', strokeWidth: 1 }}
+                    tick={{ fill: '#172D46', fontSize: 12, fontWeight: 600, fontFamily: 'Inter, sans-serif' }}
+                    dx={-6}
+                  />
+
+                  <Tooltip
+                    cursor={{ fill: 'rgba(41, 77, 107, 0.08)' }}
+                    contentStyle={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.98)',
+                      borderColor: '#294D6B',
+                      borderWidth: '1.5px',
+                      borderRadius: '12px',
+                      boxShadow: '0 4px 20px rgba(23, 45, 70, 0.15)',
+                      fontSize: '12px',
+                      color: '#172D46',
+                      fontFamily: 'Inter, sans-serif'
+                    }}
+                  />
+
+                  {/* Steel Blue Bar */}
+                  <Bar
+                    dataKey="claimsCorroborated"
+                    fill="#294D6B"
+                    radius={[6, 6, 0, 0]}
+                    name="Corroborated"
+                    maxBarSize={30}
+                  />
+
+                  {/* Antique Gold Bar */}
+                  <Bar
+                    dataKey="discrepancies"
+                    fill="#C5A77B"
+                    radius={[6, 6, 0, 0]}
+                    name="Discrepancies"
+                    maxBarSize={30}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+
+        {/* Evidence Distribution Donut Chart */}
+        <div className="rounded-2xl bg-white/90 backdrop-blur-md border border-[#D8D2C6] p-6 shadow-[0_4px_20px_rgba(23,45,70,0.05)] flex flex-col justify-between">
+          <div>
+            {/* Header */}
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#FAF6EF] border border-[#C5A77B]/50 flex items-center justify-center text-[#8E6E3C] shadow-2xs">
+                  <PieIcon className="w-5 h-5 text-[#8E6E3C]" />
+                </div>
+                <div>
+                  <h2 className="font-serif-clean text-lg font-bold text-[#172D46] tracking-wide">
+                    Evidence Streams
+                  </h2>
+                  <p className="font-sans text-xs text-[#5E7A91] mt-0.5">
+                    Multi-agency ingested telemetries
+                  </p>
+                </div>
+              </div>
+
+              <div className="px-3 py-1 rounded-full bg-[#EAF1F7] border border-[#8FAFC4]/60 text-xs font-bold text-[#294D6B] font-mono shadow-2xs">
+                45 Total
+              </div>
+            </div>
+
+            {/* Donut Chart with Center Pill */}
+            <div className="relative h-52 sm:h-56 w-full flex items-center justify-center my-2">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={evidenceTypeData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={50}
-                    outerRadius={76}
+                    innerRadius={52}
+                    outerRadius={80}
                     paddingAngle={4}
                     dataKey="count"
-                    stroke="#040713"
+                    stroke="#ffffff"
                     strokeWidth={2.5}
                   >
                     {evidenceTypeData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.grad} />
+                      <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
                   <Tooltip
-                    contentStyle={{ 
-                      backgroundColor: 'rgba(4, 9, 24, 0.95)', 
-                      borderColor: '#ff007f', 
-                      borderWidth: '1px',
-                      borderRadius: '12px', 
-                      backdropFilter: 'blur(16px)',
-                      boxShadow: '0 0 20px rgba(255, 0, 127, 0.35)',
+                    contentStyle={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.98)',
+                      borderColor: '#294D6B',
+                      borderWidth: '1.5px',
+                      borderRadius: '12px',
+                      boxShadow: '0 4px 20px rgba(23, 45, 70, 0.15)',
                       fontSize: '12px',
-                      color: '#ffffff'
+                      color: '#172D46',
+                      fontFamily: 'Inter, sans-serif'
                     }}
                     formatter={(value, name) => [`${value} items`, name]}
                   />
                 </PieChart>
               </ResponsiveContainer>
 
-              {/* Center HUD Info Badge */}
+              {/* Center Info Badge */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="w-18 h-18 rounded-full border border-sky-400/25 bg-[#04091a]/85 backdrop-blur-md flex flex-col items-center justify-center shadow-[inset_0_0_12px_rgba(0,210,255,0.25),0_0_16px_rgba(0,0,0,0.8)]">
-                  <span className="text-lg font-extrabold text-white tracking-tight drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]">45</span>
-                  <span className="text-[8px] font-mono text-sky-300 uppercase tracking-widest -mt-0.5">Streams</span>
+                <div className="w-16 h-16 rounded-full bg-[#F8F6F1] border-2 border-[#D8D2C6] flex flex-col items-center justify-center shadow-xs">
+                  <span className="font-mono text-2xl font-extrabold text-[#294D6B] leading-none">45</span>
+                  <span className="font-sans text-[9px] uppercase tracking-wider text-[#172D46] mt-0.5 font-bold">Streams</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Evidence Types List with Glowing Dots */}
-          <div className="relative z-10 space-y-1.5 mt-2 border-t border-[#0e274c]/80 pt-3.5">
+          {/* Evidence Types List */}
+          <div className="space-y-1.5 mt-3 border-t border-[#E8E4DC] pt-3 font-sans">
             {evidenceTypeData.map((item, i) => (
               <div
                 key={i}
-                className="flex items-center justify-between text-xs px-2.5 py-1.5 rounded-lg hover:bg-white/[0.04] transition-all group/item"
+                className="flex items-center justify-between text-xs px-2.5 py-1.5 rounded-lg hover:bg-[#F8F6F1] transition-colors"
               >
                 <div className="flex items-center gap-2.5">
                   <span
-                    className="w-2.5 h-2.5 rounded-full transition-transform group-hover/item:scale-125"
-                    style={{
-                      backgroundColor: item.color,
-                      boxShadow: `0 0 8px ${item.color}`
-                    }}
+                    className="w-3 h-3 rounded-full shadow-2xs"
+                    style={{ backgroundColor: item.color }}
                   />
-                  <span className="text-slate-300 group-hover/item:text-white transition-colors">
+                  <span className="text-[#172D46] font-semibold text-xs">
                     {item.name}
                   </span>
                 </div>
-                <span className="font-mono text-slate-400 group-hover/item:text-slate-200 transition-colors">
+                <span className="text-[#294D6B] text-[11px] font-bold font-mono">
                   {item.count} items
                 </span>
               </div>
@@ -520,87 +394,38 @@ export const Dashboard = () => {
         </div>
       </div>
 
-      {/* Active Cases Quick Table & Live Activity - Cyberpunk Liquid Glass HUD */}
+      {/* Active Cases & Live Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Active Cases Table - Cyberpunk Liquid Glass HUD */}
-        <div className="lg:col-span-2 relative overflow-hidden rounded-2xl bg-[#040713]/95 backdrop-blur-2xl border border-[#0d274c]/80 p-6 shadow-[0_0_35px_rgba(0,180,255,0.14),0_12px_40px_rgba(0,0,0,0.9),inset_0_1px_1px_rgba(255,255,255,0.1)] group">
-          {/* Subtle Ambient Radial Backlight */}
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_30%_30%,rgba(0,140,255,0.08)_0%,transparent_70%)]" />
-
-          {/* Top-Left Cyberpunk HUD Bracket */}
-          <div className="pointer-events-none absolute top-0 left-0 z-20">
-            <svg width="100" height="80" viewBox="0 0 100 80" fill="none">
-              {/* Outer cyan bracket with chamfer */}
-              <path
-                d="M 2 46 L 2 20 L 20 2 L 68 2"
-                stroke="#00f0ff"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                style={{ filter: 'drop-shadow(0 0 5px #00f0ff)' }}
-              />
-              {/* Inner diagonal notch */}
-              <line
-                x1="10"
-                y1="22"
-                x2="22"
-                y2="10"
-                stroke="#00f0ff"
-                strokeWidth="1.5"
-                strokeOpacity="0.75"
-              />
-            </svg>
-          </div>
-
-          {/* Bottom-Right Cyberpunk HUD Bracket & Vents */}
-          <div className="pointer-events-none absolute bottom-0 right-0 z-20">
-            <svg width="120" height="80" viewBox="0 0 120 80" fill="none">
-              {/* Outer rose bracket with chamfer */}
-              <path
-                d="M 15 78 L 98 78 L 118 58 L 118 28"
-                stroke="#ff007f"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                style={{ filter: 'drop-shadow(0 0 5px #ff007f)' }}
-              />
-              {/* 3 Diagonal Vents / Slashes /// */}
-              <line x1="72" y1="74" x2="80" y2="66" stroke="#ff007f" strokeWidth="2.5" strokeLinecap="round" />
-              <line x1="81" y1="74" x2="89" y2="66" stroke="#ff007f" strokeWidth="2.5" strokeLinecap="round" />
-              <line x1="90" y1="74" x2="98" y2="66" stroke="#ff007f" strokeWidth="2.5" strokeLinecap="round" />
-            </svg>
-          </div>
-
-          {/* Card Header: Icon, Dual-Color Title & Action */}
-          <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-            <div className="flex items-center gap-3.5">
-              {/* Custom Cyber Neon Briefcase/Cases Icon */}
-              <div className="w-12 h-12 rounded-xl bg-[#031126] border border-[#00d2ff]/80 flex items-center justify-center shadow-[0_0_16px_rgba(0,210,255,0.4),inset_0_0_12px_rgba(0,210,255,0.25)] shrink-0">
-                <Briefcase className="w-6 h-6 text-[#00d2ff]" style={{ filter: 'drop-shadow(0 0 5px rgba(0, 210, 255, 0.8))' }} />
+        {/* Active Cases Table */}
+        <div className="lg:col-span-2 rounded-2xl bg-white/90 backdrop-blur-md border border-[#D8D2C6] p-6 shadow-[0_4px_20px_rgba(23,45,70,0.05)]">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#EAF1F7] border border-[#8FAFC4]/50 flex items-center justify-center text-[#294D6B]">
+                <Briefcase className="w-5 h-5" />
               </div>
-
               <div>
-                <h2 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-1.5">
-                  <span>Assigned Investigation</span>
-                  <span className="text-[#00e5ff] drop-shadow-[0_0_10px_rgba(0,229,255,0.8)]">Cases</span>
+                <h2 className="font-serif-clean text-lg font-bold text-[#172D46] tracking-wide">
+                  Assigned Investigation Cases
                 </h2>
-                <p className="text-xs text-[#94a3b8] mt-0.5 font-normal">
-                  Active dossiers currently under investigation
+                <p className="font-sans text-xs text-[#5E7A91] mt-0.5">
+                  Active dossiers currently under your oversight
                 </p>
               </div>
             </div>
 
             <button
               onClick={() => navigate('/cases')}
-              className="px-3.5 py-1.5 rounded-full bg-[#050f24]/90 border border-[#00d2ff]/40 hover:border-[#00d2ff] hover:bg-[#00d2ff]/10 text-xs font-mono font-medium text-sky-300 hover:text-white shadow-[0_0_12px_rgba(0,210,255,0.25)] transition-all flex items-center gap-1.5 self-start sm:self-auto"
+              className="px-4 py-1.5 rounded-full bg-[#294D6B] hover:bg-[#172D46] text-xs font-bold text-[#E8E4DC] border border-[#294D6B] transition-all flex items-center gap-1.5 self-start sm:self-auto font-sans shadow-2xs"
             >
               <span>View All Cases</span>
-              <ArrowUpRight className="w-3.5 h-3.5" />
+              <ArrowUpRight className="w-3.5 h-3.5 text-[#E8E4DC]" />
             </button>
           </div>
 
-          {/* Table Canvas */}
-          <div className="relative z-10 overflow-x-auto rounded-xl border border-[#0e274c]/80 mt-4">
+          {/* Table Container */}
+          <div className="overflow-x-auto rounded-xl border border-[#D8D2C6] mt-4">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#061226]/90 text-sky-300/80 font-mono text-[11px] uppercase tracking-wider border-b border-[#0e274c]">
+              <thead className="bg-[#F8F6F1] text-[#294D6B] font-sans font-bold text-[11px] uppercase tracking-wider border-b border-[#D8D2C6]">
                 <tr>
                   <th className="py-3 px-3.5">Case ID</th>
                   <th className="py-3 px-3.5">Incident Brief</th>
@@ -609,20 +434,20 @@ export const Dashboard = () => {
                   <th className="py-3 px-3.5 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#0e274c]/50">
+              <tbody className="divide-y divide-[#E8E4DC]">
                 {cases.map((c) => (
                   <tr 
                     key={c.id} 
-                    className={`hover:bg-sky-500/[0.08] transition-colors group/row ${
-                      c.id === currentCase.id ? 'bg-sky-500/[0.09]' : ''
+                    className={`hover:bg-[#F8F6F1]/80 transition-colors ${
+                      c.id === currentCase.id ? 'bg-[#E8E4DC]/40' : ''
                     }`}
                   >
-                    <td className="py-3.5 px-3.5 font-mono font-bold text-[#00e5ff] tracking-wider drop-shadow-[0_0_6px_rgba(0,210,255,0.4)]">
+                    <td className="py-3.5 px-3.5 font-mono font-bold text-[#294D6B]">
                       {c.id}
                     </td>
                     <td className="py-3.5 px-3.5">
-                      <div className="font-medium text-slate-100 group-hover/row:text-white transition-colors line-clamp-1">{c.title}</div>
-                      <div className="text-[11px] text-slate-400 mt-0.5">{c.incidentType}</div>
+                      <div className="font-serif-clean font-bold text-[#172D46] text-xs line-clamp-1">{c.title}</div>
+                      <div className="text-[11px] text-[#5E7A91] mt-0.5 font-sans">{c.incidentType}</div>
                     </td>
                     <td className="py-3.5 px-3.5">
                       <Badge variant={c.status} size="sm">
@@ -640,7 +465,7 @@ export const Dashboard = () => {
                           selectCase(c.id);
                           navigate('/statement-review');
                         }}
-                        className="px-3 py-1 rounded-xl bg-[#031126] hover:bg-sky-500/25 border border-sky-400/40 hover:border-sky-300 text-sky-200 text-[11px] font-medium shadow-[0_0_10px_rgba(0,210,255,0.2)] hover:shadow-[0_0_16px_rgba(0,210,255,0.5)] transition-all"
+                        className="px-3.5 py-1 rounded-lg bg-white hover:bg-[#294D6B] text-[#294D6B] hover:text-[#E8E4DC] text-[11px] font-bold border border-[#D8D2C6] hover:border-[#294D6B] transition-all font-sans shadow-2xs"
                       >
                         Inspect
                       </button>
@@ -652,102 +477,55 @@ export const Dashboard = () => {
           </div>
         </div>
 
-        {/* Live Audit Activity Feed - Cyberpunk Liquid Glass HUD */}
-        <div className="relative overflow-hidden rounded-2xl bg-[#040713]/95 backdrop-blur-2xl border border-[#0d274c]/80 p-6 shadow-[0_0_35px_rgba(255,0,127,0.14),0_12px_40px_rgba(0,0,0,0.9),inset_0_1px_1px_rgba(255,255,255,0.1)] group flex flex-col justify-between">
-          {/* Subtle Ambient Radial Backlight */}
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_30%,rgba(255,0,127,0.08)_0%,transparent_70%)]" />
-
-          {/* Top-Left Cyberpunk HUD Bracket */}
-          <div className="pointer-events-none absolute top-0 left-0 z-20">
-            <svg width="100" height="80" viewBox="0 0 100 80" fill="none">
-              {/* Outer cyan bracket with chamfer */}
-              <path
-                d="M 2 46 L 2 20 L 20 2 L 68 2"
-                stroke="#00f0ff"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                style={{ filter: 'drop-shadow(0 0 5px #00f0ff)' }}
-              />
-              {/* Inner diagonal notch */}
-              <line
-                x1="10"
-                y1="22"
-                x2="22"
-                y2="10"
-                stroke="#00f0ff"
-                strokeWidth="1.5"
-                strokeOpacity="0.75"
-              />
-            </svg>
-          </div>
-
-          {/* Bottom-Right Cyberpunk HUD Bracket & Vents */}
-          <div className="pointer-events-none absolute bottom-0 right-0 z-20">
-            <svg width="120" height="80" viewBox="0 0 120 80" fill="none">
-              {/* Outer rose bracket with chamfer */}
-              <path
-                d="M 15 78 L 98 78 L 118 58 L 118 28"
-                stroke="#ff007f"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                style={{ filter: 'drop-shadow(0 0 5px #ff007f)' }}
-              />
-              {/* 3 Diagonal Vents / Slashes /// */}
-              <line x1="72" y1="74" x2="80" y2="66" stroke="#ff007f" strokeWidth="2.5" strokeLinecap="round" />
-              <line x1="81" y1="74" x2="89" y2="66" stroke="#ff007f" strokeWidth="2.5" strokeLinecap="round" />
-              <line x1="90" y1="74" x2="98" y2="66" stroke="#ff007f" strokeWidth="2.5" strokeLinecap="round" />
-            </svg>
-          </div>
-
+        {/* Live Audit Activity Feed */}
+        <div className="rounded-2xl bg-white/90 backdrop-blur-md border border-[#D8D2C6] p-6 shadow-[0_4px_20px_rgba(23,45,70,0.05)] flex flex-col justify-between">
           <div>
-            {/* Header: Icon, Dual-Color Title & Action */}
-            <div className="relative z-10 flex items-center justify-between gap-3 mb-4">
+            <div className="flex items-center justify-between gap-3 mb-4">
               <div className="flex items-center gap-3">
-                {/* Cyber Neon Activity Icon */}
-                <div className="w-12 h-12 rounded-xl bg-[#14061a] border border-[#ff007f]/80 flex items-center justify-center shadow-[0_0_16px_rgba(255,0,127,0.4),inset_0_0_12px_rgba(255,0,127,0.25)] shrink-0">
-                  <Activity className="w-6 h-6 text-[#ff007f]" style={{ filter: 'drop-shadow(0 0 5px rgba(255, 0, 127, 0.8))' }} />
+                <div className="w-10 h-10 rounded-xl bg-[#FAF6EF] border border-[#C5A77B]/50 flex items-center justify-center text-[#8E6E3C]">
+                  <Activity className="w-5 h-5 text-[#8E6E3C]" />
                 </div>
-
                 <div>
-                  <h2 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-1.5">
-                    <span>Live Investigation</span>
-                    <span className="text-[#ff007f] drop-shadow-[0_0_10px_rgba(255,0,127,0.8)]">Activity</span>
+                  <h2 className="font-serif-clean text-lg font-bold text-[#172D46] tracking-wide">
+                    Live Audit Ledger
                   </h2>
-                  <p className="text-xs text-[#94a3b8] mt-0.5 font-normal">
-                    Cryptographic immutable audit stream
+                  <p className="font-sans text-xs text-[#5E7A91] mt-0.5">
+                    Immutable investigation ledger
                   </p>
                 </div>
               </div>
 
               <button
                 onClick={() => navigate('/audit-logs')}
-                className="px-3 py-1.5 rounded-full bg-[#14061a]/90 border border-[#ff007f]/40 hover:border-[#ff007f] hover:bg-[#ff007f]/10 text-xs font-mono font-medium text-rose-300 hover:text-white shadow-[0_0_12px_rgba(255,0,127,0.25)] transition-all shrink-0"
+                className="px-3 py-1 rounded-full bg-white hover:bg-[#F8F6F1] text-xs font-bold text-[#294D6B] border border-[#D8D2C6] hover:border-[#294D6B] transition-all shrink-0 font-sans shadow-2xs"
               >
-                Full Ledger
+                Full Log
               </button>
             </div>
 
-            {/* Activity Feed Cards */}
-            <div className="relative z-10 space-y-3 mt-4 flex-1 overflow-y-auto max-h-[380px] pr-1">
+            {/* Audit Log Cards */}
+            <div className="space-y-2.5 mt-4 overflow-y-auto max-h-[380px] pr-1">
               {auditLogs.slice(0, 5).map((log) => (
                 <div 
                   key={log.id} 
-                  className="p-3.5 rounded-xl bg-[#061226]/75 hover:bg-[#081a38] border border-[#0e274c] hover:border-sky-400/50 text-xs shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),0_4px_16px_rgba(0,0,0,0.5)] transition-all duration-200 group/log"
+                  className="p-3.5 rounded-xl bg-[#F8F6F1] hover:bg-white border border-[#D8D2C6] hover:border-[#294D6B]/50 text-xs transition-colors shadow-2xs"
                 >
-                  <div className="flex items-center justify-between text-[11px] font-mono mb-1.5">
-                    <span className="text-[#00e5ff] font-bold tracking-wide drop-shadow-[0_0_6px_rgba(0,229,255,0.5)]">
+                  <div className="flex items-center justify-between text-[11px] mb-1 font-mono font-bold">
+                    <span className="text-[#294D6B]">
                       {log.actionType}
                     </span>
-                    <span className="text-slate-400">
+                    <span className="text-[#5E7A91] font-mono text-[10px]">
                       {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-300 group-hover/log:text-slate-100 line-clamp-2 leading-relaxed transition-colors">
+                  <p className="text-[11px] text-[#233B54] line-clamp-2 leading-relaxed font-sans">
                     {log.details}
                   </p>
-                  <div className="mt-2 pt-1.5 border-t border-white/[0.04] flex items-center justify-between text-[10px] font-mono text-slate-400">
-                    <span className="text-sky-300/80 font-medium">{log.role}</span>
-                    <span className="text-rose-400/90 font-semibold">Block #{log.blockNumber}</span>
+                  <div className="mt-2 pt-1.5 border-t border-[#E8E4DC] flex items-center justify-between text-[10px] text-[#5E7A91] font-sans">
+                    <span className="font-semibold text-[#172D46]">{log.role}</span>
+                    <span className="font-mono font-bold text-[#172D46] bg-[#C5A77B] px-2 py-0.5 rounded border border-[#A88A5E]">
+                      Block #{log.blockNumber}
+                    </span>
                   </div>
                 </div>
               ))}
