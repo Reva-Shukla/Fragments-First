@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+backend/venv/
+
+# JavaScript and build output
+node_modules/
+dist/
+build/
+.next/
+
+# Secrets
+*.env
+*.env.*
+!.env.example
+backend/.env
+
+# SQLite
+*.db
+*.sqlite3
+
+# Uploads & generated reports
+uploads/*
+!uploads/.gitkeep
+generated_reports/*
+!generated_reports/.gitkeep
+backend/uploads/*
+!backend/uploads/.gitkeep
+backend/generated_reports/*
+!backend/generated_reports/.gitkeep
+
+# Testing & Cache
+.pytest_cache/
+.cache/
+coverage/
+.coverage
+htmlcov/
+*.tmp
+*.temp
+*.log
+.DS_Store
+Thumbs.db
