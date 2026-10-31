@@ -1,0 +1,108 @@
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../../components/Toast';
+import Spinner from '../../components/Spinner';
+
+export default function VictimLogin() {
+  const { login } = useAuth();
+  const toast = useToast();
+  const navigate = useNavigate();
+
+  const [form, setForm] = useState({ email: '', password: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const set = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
+
+  const validate = () => {
+    const errs = {};
+    if (!form.email.trim()) errs.email = 'Email is required.';
+    if (!form.password)     errs.password = 'Password is required.';
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validate()) return;
+    setSubmitting(true);
+    try {
+      const user = await login(form.email.trim().toLowerCase(), form.password);
+      if (user.role === 'investigator' || user.role === 'admin') {
+        navigate('/authority/dashboard');
+      } else {
+        navigate('/victim/dashboard');
+      }
+    } catch (err) {
+      const msg = err.response?.data?.detail || 'Incorrect email or password.';
+      toast(msg, 'error');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="auth-page">
+      <div className="auth-card">
+        <span className="auth-logo">Fragment First</span>
+
+        <h1 className="auth-title">Welcome back</h1>
+        <p className="auth-subtitle">
+          Sign in to access your private space. Your display name will greet you once inside.
+        </p>
+
+        <form className="auth-form" onSubmit={handleSubmit} noValidate>
+          <div className="form-group">
+            <label htmlFor="login-email" className="form-label">Email address</label>
+            <input
+              id="login-email"
+              type="email"
+              className="form-input"
+              placeholder="you@example.com"
+              value={form.email}
+              onChange={set('email')}
+              autoComplete="email"
+              autoFocus
+            />
+            {errors.email && <span className="form-error">{errors.email}</span>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="login-password" className="form-label">Password</label>
+            <input
+              id="login-password"
+              type="password"
+              className="form-input"
+              placeholder="Your password"
+              value={form.password}
+              onChange={set('password')}
+              autoComplete="current-password"
+            />
+            {errors.password && <span className="form-error">{errors.password}</span>}
+          </div>
+
+          <button
+            id="login-submit-btn"
+            type="submit"
+            className="btn btn-primary"
+            style={{ width: '100%' }}
+            disabled={submitting}
+          >
+            {submitting ? <Spinner /> : 'Sign In'}
+          </button>
+
+          <p style={{ textAlign: 'center', fontSize: '13px', color: 'var(--white-muted)' }}>
+            New here?{' '}
+            <Link to="/victim/register" style={{ color: 'var(--cerulean)' }}>Create a private account</Link>
+          </p>
+
+          <p style={{ textAlign: 'center', fontSize: '13px', color: 'var(--white-muted)' }}>
+            Are you an investigator?{' '}
+            <Link to="/authority/login" style={{ color: 'var(--rose)' }}>Authority sign-in</Link>
+          </p>
+        </form>
+      </div>
+    </div>
+  );
+}
