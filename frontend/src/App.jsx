@@ -8,6 +8,7 @@ import VictimRegister       from './pages/victim/VictimRegister';
 import VictimLogin          from './pages/victim/VictimLogin';
 import VictimDashboard      from './pages/victim/VictimDashboard';
 import MyStatement          from './pages/victim/MyStatement';
+import VoiceStatement       from './pages/victim/VoiceStatement';
 import MySubmissions        from './pages/victim/MySubmissions';
 import PrivacyIdentity      from './pages/victim/PrivacyIdentity';
 import HelpGuidance         from './pages/victim/HelpGuidance';
@@ -35,6 +36,9 @@ export default function App() {
             } />
             <Route path="/victim/statement" element={
               <ProtectedRoute role="victim"><MyStatement /></ProtectedRoute>
+            } />
+            <Route path="/victim/voice" element={
+              <ProtectedRoute role="victim"><VoiceStatement /></ProtectedRoute>
             } />
             <Route path="/victim/submissions" element={
               <ProtectedRoute role="victim"><MySubmissions /></ProtectedRoute>

@@ -8,6 +8,9 @@ class StatementCreate(BaseModel):
     original_text: str = Field(..., min_length=3, description="Original fragmented statement text from victim")
     is_draft: bool = False
     audio_file_path: Optional[str] = None
+    # Voice statement fields
+    language: Optional[str] = "en"               # ISO 639-1 language code
+    transcript_source: Optional[str] = "typed"   # typed, voice_live, voice_upload, imported
 
 
 class StatementUpdate(BaseModel):
@@ -34,9 +37,12 @@ class StatementResponse(BaseModel):
     is_draft: bool
     version: int
     audio_file_path: Optional[str] = None
+    language: Optional[str] = "en"
+    transcript_source: Optional[str] = "typed"
     status: str
     created_at: datetime
     updated_at: datetime
     reconstructions: List[ReconstructionSimple] = []
 
     model_config = ConfigDict(from_attributes=True)
+

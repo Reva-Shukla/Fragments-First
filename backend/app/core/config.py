@@ -13,10 +13,27 @@ class Settings(BaseSettings):
     # Security
     SECRET_KEY: str = "fragment_first_super_secret_jwt_key_2025_prod_dev_hash"
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30          # short-lived access token
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 30            # long-lived refresh token (persistent login)
+
+    # Cookie settings for the victim-side persistent session
+    # Set COOKIE_SECURE=false in development (HTTP). Must be true in production (HTTPS).
+    COOKIE_SECURE: bool = False
+    COOKIE_SAMESITE: str = "lax"
+    COOKIE_DOMAIN: Union[str, None] = None         # None = current domain
     
     # Database
     DATABASE_URL: str = "sqlite:///./fragment_first.db"
+
+    # WebAuthn / Passkeys (Victim biometric login)
+    # RP = Relying Party (your web app's identity in the WebAuthn protocol)
+    # RP_ID must match the domain the frontend is served from (no port, no protocol).
+    # In development: localhost.  In production: your-domain.com
+    WEBAUTHN_RP_ID: str = "localhost"
+    WEBAUTHN_RP_NAME: str = "Fragment First"
+    # WEBAUTHN_ORIGIN must exactly match window.location.origin on the client.
+    # In dev: http://localhost:5173.  In production: https://your-domain.com
+    WEBAUTHN_ORIGIN: str = "http://localhost:5173"
     
     # LLM Settings
     GEMINI_API_KEY: Union[str, None] = None

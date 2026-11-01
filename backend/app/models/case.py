@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, JSON
 from sqlalchemy.orm import relationship
 from app.database.base import Base
 
@@ -11,6 +11,12 @@ class Case(Base):
     title = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
     status = Column(String(50), nullable=False, default="open")  # open, in_progress, review, closed
+    # Category: free-form — murder, theft, cybercrime, domestic_violence, fraud, missing_person, harassment, other, etc.
+    category = Column(String(100), nullable=True, default="other")
+    # Priority: critical, high, medium, low
+    priority = Column(String(20), nullable=True, default="medium")
+    # Unique case reference number (e.g. FF-2025-0001)
+    reference_number = Column(String(50), nullable=True, index=True)
     victim_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     investigator_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
