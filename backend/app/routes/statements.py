@@ -42,6 +42,8 @@ def submit_statement(
         is_draft=statement_in.is_draft,
         version=version,
         audio_file_path=statement_in.audio_file_path,
+        language=statement_in.language or "en",
+        transcript_source=statement_in.transcript_source or "typed",
         status="draft" if statement_in.is_draft else "submitted"
     )
     db.add(statement)

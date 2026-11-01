@@ -9,6 +9,9 @@ from app.models.timeline import Event
 from app.models.investigation import Investigation
 from app.models.report import Report
 from app.models.audit_log import AuditLog
+from app.models.nexus import NexusConnection
+from app.models.entity import ExtractedEntity
+from app.models.webauthn import WebAuthnCredential
 
 __all__ = [
     "User",
@@ -22,4 +25,8 @@ __all__ = [
     "Investigation",
     "Report",
     "AuditLog",
+    "NexusConnection",
+    "ExtractedEntity",
+    "WebAuthnCredential",
 ]
+

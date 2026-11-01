@@ -4,6 +4,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../components/Toast';
 import { authApi } from '../../api/client';
 import Spinner from '../../components/Spinner';
+import { startRegistration } from '@simplewebauthn/browser';
+import { webauthnApi } from '../../api/client';
 
 // ── Password strength scoring ────────────────────────────────────
 function scorePassword(pw) {
@@ -177,6 +179,7 @@ export default function VictimRegister() {
   });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
+const [usePasskey, setUsePasskey] = useState(false); // optional passkey registration
 
   const set = (field) => (e) => {
     setForm((f) => ({ ...f, [field]: e.target.value }));
@@ -217,25 +220,39 @@ export default function VictimRegister() {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
-    setSubmitting(true);
-    try {
-      const user = await register({
-        username: form.username.trim(),
-        email: form.email.trim().toLowerCase(),
-        password: form.password,
-        role: 'victim',
-      });
-      toast(`Welcome, ${user.username || user.full_name}. Your account is ready.`, 'success');
-      navigate('/victim/dashboard');
-    } catch (err) {
-      const msg = err.response?.data?.detail || 'Registration failed. Please try again.';
-      toast(msg, 'error');
-    } finally {
-      setSubmitting(false);
+  e.preventDefault();
+  if (!validate()) return;
+  setSubmitting(true);
+  try {
+    const user = await register({
+      username: form.username.trim(),
+      email: form.email.trim().toLowerCase(),
+      password: form.password,
+      role: 'victim',
+    });
+    // Optional passkey registration
+    if (usePasskey) {
+      try {
+        const { data: options } = await webauthnApi.registerOptions();
+        const attResp = await startRegistration(options);
+        await webauthnApi.registerVerify({ credential: attResp, device_name: 'Browser Passkey' });
+        toast('Passkey registered successfully.', 'success');
+      } catch (webauthnErr) {
+        console.error('WebAuthn registration error', webauthnErr);
+        toast('Passkey registration failed. You can still use password login.', 'error');
+      }
     }
-  };
+    toast(`Welcome, ${user.username || user.full_name}. Your account is ready.`, 'success');
+    navigate('/victim/statement');
+  } catch (err) {
+    const msg = err.response?.data?.detail || 'Registration failed. Please try again.';
+    toast(msg, 'error');
+  } finally {
+    setSubmitting(false);
+  }
+};
+
+
 
   // Username status indicator
   const renderUsernameStatus = () => {
@@ -387,7 +404,13 @@ export default function VictimRegister() {
               </span>
             )}
           </div>
-
+          {/* Optional Passkey registration toggle */}
+          <div className="form-group" style={{ marginTop: '12px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <input type="checkbox" checked={usePasskey} onChange={() => setUsePasskey(!usePasskey)} />
+              Register a Passkey (biometric) for future login (optional)
+            </label>
+          </div>
           {/* ── Submit ── */}
           <button
             id="register-submit-btn"

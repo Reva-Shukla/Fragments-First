@@ -28,9 +28,12 @@ export const Login = () => {
   const [step, setStep] = useState(1);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetSent, setResetSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleRoleChange = (roleId) => {
     setSelectedRole(roleId);
+    setError(null);
     const found = ROLES.find(r => r.id === roleId);
     if (found) {
       setEmail(found.email);
@@ -39,13 +42,32 @@ export const Login = () => {
 
   const handleCredentialsSubmit = (e) => {
     e.preventDefault();
+    setError(null);
+    if (!email.trim() || !password) {
+      setError('Please enter your email and password.');
+      return;
+    }
     setStep(2);
   };
 
-  const handleMfaSubmit = (e) => {
+  const handleMfaSubmit = async (e) => {
     e.preventDefault();
-    login(email, password, selectedRole, mfaCode.join(''));
-    navigate('/dashboard');
+    setError(null);
+    setSubmitting(true);
+    try {
+      const result = await login(email.trim().toLowerCase(), password, selectedRole, mfaCode.join(''));
+      if (result.success) {
+        navigate('/dashboard');
+      } else {
+        setError(result.error || 'Login failed. Please try again.');
+        setStep(1);
+      }
+    } catch {
+      setError('Network error. Please try again.');
+      setStep(1);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleMfaDigitChange = (index, value) => {
@@ -166,6 +188,14 @@ export const Login = () => {
               </div>
             </div>
 
+            {/* Error message */}
+            {error && (
+              <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                <span>{error}</span>
+              </div>
+            )}
+
             <button
               type="submit"
               className="w-full mt-2 py-3 px-4 bg-[#294D6B] hover:bg-[#172D46] text-white font-medium text-xs rounded-xl flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
@@ -205,6 +235,13 @@ export const Login = () => {
               <span>Session will be bound to FIPS 140-3 Hardware Token ID #4910</span>
             </div>
 
+            {error && (
+              <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                <span>{error}</span>
+              </div>
+            )}
+
             <div className="flex gap-2">
               <button
                 type="button"
@@ -215,10 +252,17 @@ export const Login = () => {
               </button>
               <button
                 type="submit"
-                className="w-2/3 py-2.5 px-4 bg-[#294D6B] hover:bg-[#172D46] text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
+                disabled={submitting}
+                className="w-2/3 py-2.5 px-4 bg-[#294D6B] hover:bg-[#172D46] text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer disabled:opacity-60"
               >
-                <span>Authorize & Enter</span>
-                <CheckCircle className="w-4 h-4" />
+                {submitting ? (
+                  <span>Authenticating...</span>
+                ) : (
+                  <>
+                    <span>Authorize &amp; Enter</span>
+                    <CheckCircle className="w-4 h-4" />
+                  </>
+                )}
               </button>
             </div>
           </form>

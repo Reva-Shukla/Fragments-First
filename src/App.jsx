@@ -20,7 +20,27 @@ import { AuditLogs } from './pages/AuditLogs';
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
+
+  // Wait for AuthContext to finish restoring any stored session
+  if (loading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#172D46',
+        color: '#8FAFC4',
+        fontFamily: 'monospace',
+        fontSize: '13px',
+        letterSpacing: '0.08em',
+      }}>
+        AUTHENTICATING SESSION...
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }

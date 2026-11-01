@@ -1,6 +1,7 @@
 import re
 from datetime import timedelta
-from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Request, Response
+from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
@@ -9,6 +10,8 @@ from app.core.security import (
     hash_password,
     verify_password,
     create_access_token,
+    create_refresh_token,
+    decode_refresh_token,
     get_current_user
 )
 from app.core.audit import create_audit_log
@@ -17,6 +20,34 @@ from app.models.user import User
 from app.schemas.user import (
     UserCreate, UserLogin, UserResponse, TokenResponse, UsernameAvailability
 )
+
+ROUTER_COOKIE_NAME = "ff_victim_session"
+
+
+def _set_refresh_cookie(response: Response, refresh_token: str) -> None:
+    """
+    Attaches the refresh token as an HttpOnly, Secure, SameSite cookie.
+    Called after login and register for victim accounts.
+    """
+    response.set_cookie(
+        key=ROUTER_COOKIE_NAME,
+        value=refresh_token,
+        httponly=True,
+        secure=settings.COOKIE_SECURE,          # False in dev (HTTP), True in prod (HTTPS)
+        samesite=settings.COOKIE_SAMESITE,      # 'lax' prevents CSRF while allowing redirects
+        max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,   # seconds
+        path="/api/auth",                       # scoped: only sent to auth endpoints
+        domain=settings.COOKIE_DOMAIN or None,
+    )
+
+
+def _clear_refresh_cookie(response: Response) -> None:
+    """Clears the victim session cookie (sets it expired)."""
+    response.delete_cookie(
+        key=ROUTER_COOKIE_NAME,
+        path="/api/auth",
+        domain=settings.COOKIE_DOMAIN or None,
+    )
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -124,15 +155,24 @@ def register(user_in: UserCreate, request: Request, db: Session = Depends(get_db
         ip_address=request.client.host if request.client else None
     )
 
-    access_token = create_access_token(
-        data={"sub": user.email, "role": user.role, "id": user.id}
-    )
+    # Issue tokens
+    token_data = {"sub": user.email, "role": user.role, "id": user.id}
+    access_token  = create_access_token(data=token_data)
+    refresh_token = create_refresh_token(data=token_data)
 
-    return TokenResponse(
-        access_token=access_token,
-        token_type="bearer",
-        user=UserResponse.model_validate(user)
+    response = JSONResponse(
+        status_code=status.HTTP_201_CREATED,
+        content=TokenResponse(
+            access_token=access_token,
+            token_type="bearer",
+            user=UserResponse.model_validate(user)
+        ).model_dump(mode="json"),
     )
+    # Set HttpOnly cookie for victim persistent login
+    if user.role == "victim":
+        _set_refresh_cookie(response, refresh_token)
+
+    return response
 
 
 @router.post("/login", response_model=TokenResponse)
@@ -165,15 +205,23 @@ def login(
         ip_address=request.client.host if request.client else None
     )
 
-    access_token = create_access_token(
-        data={"sub": user.email, "role": user.role, "id": user.id}
-    )
+    # Issue tokens
+    token_data = {"sub": user.email, "role": user.role, "id": user.id}
+    access_token  = create_access_token(data=token_data)
+    refresh_token = create_refresh_token(data=token_data)
 
-    return TokenResponse(
-        access_token=access_token,
-        token_type="bearer",
-        user=UserResponse.model_validate(user)
+    response = JSONResponse(
+        content=TokenResponse(
+            access_token=access_token,
+            token_type="bearer",
+            user=UserResponse.model_validate(user)
+        ).model_dump(mode="json"),
     )
+    # Set HttpOnly cookie for victim persistent login
+    if user.role == "victim":
+        _set_refresh_cookie(response, refresh_token)
+
+    return response
 
 
 @router.post("/token", response_model=TokenResponse, summary="OAuth2 Token Login")
@@ -233,3 +281,80 @@ def get_me(current_user: User = Depends(get_current_user)):
 def logout(current_user: User = Depends(get_current_user)):
     """Acknowledges logout; the client must discard its bearer token."""
     return {"message": "Successfully logged out. Client should discard the access token."}
+
+
+# ── Victim persistent session endpoints ───────────────────────────────────────
+
+@router.post("/session", response_model=TokenResponse, summary="Silent session refresh")
+def refresh_session(
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    """
+    Silent session refresh for victim persistent login.
+
+    Reads the HttpOnly 'ff_victim_session' cookie, validates the refresh token,
+    and returns a new short-lived access token + rotates the refresh cookie.
+
+    Called by the victim frontend on every page load to restore session without
+    requiring the victim to log in again.
+
+    Returns 401 if:
+    - The cookie is absent or invalid
+    - The refresh token is expired or revoked
+    - The associated user no longer exists or is inactive
+    """
+    raw_token = request.cookies.get(ROUTER_COOKIE_NAME)
+    if not raw_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="No session cookie present.",
+        )
+
+    payload = decode_refresh_token(raw_token)
+    if payload is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Session has expired or is invalid. Please log in again.",
+        )
+
+    email = payload.get("sub")
+    if not email:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Malformed session.")
+
+    user = db.query(User).filter(User.email == email, User.is_active == True).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Account not found or deactivated.",
+        )
+
+    # Issue new access token and rotate the refresh cookie
+    token_data    = {"sub": user.email, "role": user.role, "id": user.id}
+    access_token  = create_access_token(data=token_data)
+    refresh_token = create_refresh_token(data=token_data)
+
+    response = JSONResponse(
+        content=TokenResponse(
+            access_token=access_token,
+            token_type="bearer",
+            user=UserResponse.model_validate(user)
+        ).model_dump(mode="json"),
+    )
+    _set_refresh_cookie(response, refresh_token)   # rotate cookie
+    return response
+
+
+@router.post("/cookie-logout", summary="Victim cookie logout")
+def cookie_logout(
+    request: Request,
+):
+    """
+    Clears the victim session cookie.
+    Does not require authentication — clearing a non-existent cookie is harmless.
+    The frontend must also discard its in-memory access token.
+    """
+    response = JSONResponse(content={"message": "Session cookie cleared."})
+    _clear_refresh_cookie(response)
+    return response
+

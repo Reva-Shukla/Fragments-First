@@ -15,6 +15,10 @@ class Statement(Base):
     is_draft = Column(Boolean, default=False)
     version = Column(Integer, default=1)
     audio_file_path = Column(String(500), nullable=True)
+    # Language code of the original statement (e.g. 'en', 'hi', 'pa')
+    language = Column(String(10), nullable=True, default='en')
+    # How was the text captured: 'typed', 'voice_live', 'voice_upload', 'imported'
+    transcript_source = Column(String(30), nullable=True, default='typed')
     status = Column(String(50), default="submitted")  # draft, submitted, under_review, approved
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))

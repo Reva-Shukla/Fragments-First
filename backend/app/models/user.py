@@ -26,3 +26,5 @@ class User(Base):
     statements = relationship("Statement", back_populates="victim")
     uploaded_evidence = relationship("Evidence", back_populates="uploader")
     audit_logs = relationship("AuditLog", back_populates="user")
+    webauthn_credentials = relationship("WebAuthnCredential", back_populates="user", cascade="all, delete-orphan")
+    webauthn_challenges = relationship("WebAuthnChallenge", back_populates="user", cascade="all, delete-orphan")

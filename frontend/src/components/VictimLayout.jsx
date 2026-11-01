@@ -3,14 +3,16 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const NAV_ITEMS = [
-  { path: '/victim/dashboard', icon: '⬡', label: 'My Space' },
-  { path: '/victim/statement', icon: '✍', label: 'My Statement' },
-  { path: '/victim/submissions', icon: '📋', label: 'My Submissions' },
-  { path: '/victim/redaction', icon: '🔲', label: 'Redaction Studio' },
-  { path: '/victim/receipts', icon: '🧾', label: 'Consent Receipts' },
-  { path: '/victim/privacy', icon: '🔒', label: 'Privacy & Identity' },
-  { path: '/victim/help', icon: '❓', label: 'Help & Guidance' },
+  { path: '/victim/dashboard',  icon: '⬡',  label: 'My Space' },
+  { path: '/victim/statement',  icon: '✍',  label: 'My Statement' },
+  { path: '/victim/voice',      icon: '🎙', label: 'Voice Statement' },
+  { path: '/victim/submissions',icon: '📋', label: 'My Submissions' },
+  { path: '/victim/redaction',  icon: '🔲', label: 'Redaction Studio' },
+  { path: '/victim/receipts',   icon: '🧾', label: 'Consent Receipts' },
+  { path: '/victim/privacy',    icon: '🔒', label: 'Privacy & Identity' },
+  { path: '/victim/help',       icon: '❓', label: 'Help & Guidance' },
 ];
+
 
 export default function VictimLayout({ children }) {
   const { displayName, logout } = useAuth();

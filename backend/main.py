@@ -22,6 +22,8 @@ from app.routes.contradictions import router as contradictions_router
 from app.routes.timeline import router as timeline_router
 from app.routes.investigations import router as investigations_router
 from app.routes.reports import router as reports_router
+from app.routes.voice import router as voice_router
+from app.routes.nexus import router as nexus_router
 
 # Configure logging
 logging.basicConfig(
@@ -118,6 +120,8 @@ app.include_router(contradictions_router, prefix=settings.API_V1_STR)
 app.include_router(timeline_router, prefix=settings.API_V1_STR)
 app.include_router(investigations_router, prefix=settings.API_V1_STR)
 app.include_router(reports_router, prefix=settings.API_V1_STR)
+app.include_router(voice_router, prefix=settings.API_V1_STR)
+app.include_router(nexus_router, prefix=settings.API_V1_STR)
 
 
 if __name__ == "__main__":
