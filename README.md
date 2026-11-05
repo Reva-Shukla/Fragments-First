@@ -1,297 +1,57 @@
-# Fragment First: AI-Powered Legal Communication Assistance & Evidence Investigation Platform
+# Fragment First
 
-**Fragment First** is an AI-powered legal assistance and evidence investigation platform designed to empower individuals who struggle to communicate their experiences clearly, especially during high-stress legal situations and trauma recovery.
+**Fragment First** is a trauma-informed platform designed to help individuals document, organise, and preserve fragmented experiences through guided evidence capture and AI-assisted structuring.
 
-Victims can submit fragmented thoughts, incomplete sentences, or recordings. The trauma-informed LLM pipeline reconstructs these fragments into coherent, readable narratives while strictly preserving stated uncertainties and avoiding the fabrication of details. Qualified human investigators and attorneys can then examine statements, extract atomic factual claims, verify them against physical/documentary evidence, detect contradictions, sequence chronological timelines, and generate forensic PDF reports.
+The platform focuses on sensitive documentation, prioritising privacy, user control, and responsible information handling.
 
----
+## Features
 
-## Ethical Architecture & Safeguards
+- **Guided Documentation:** Structured prompts for recording experiences and relevant details.
+- **Evidence Management:** Organised case records and supporting information.
+- **AI-Assisted Structuring:** LLM-based organisation of fragmented narratives.
+- **Privacy-Focused Design:** Anonymous display identities and controlled access to sensitive information.
+- **Authority Portal:** Dedicated interface for reviewing and managing submitted cases.
+- **Case Tracking:** Case status management and review workflows.
 
-- **No Credibility or Deception Scoring**: The system NEVER calculates truthfulness or lie-detection metrics.
-- **No Determination of Guilt or Innocence**: Final legal judgments rest solely with human authorities.
-- **Preservation of Uncertainty**: Hesitations, approximations, and tentative memories are explicitly preserved.
-- **Missing Evidence Protocol**: Absence of evidence is never treated as proof of contradiction.
-- **Statement Immutability**: Original raw victim statements are permanently preserved and never overwritten.
-- **Victim Approval Gate**: AI reconstructions require victim review and explicit sign-off before being treated as approved.
-- **Counterfactual Isolation**: Hypothetical "what-if" investigative scenarios are strictly flagged and never injected into the ground-truth timeline.
+## Tech Stack
 
----
+- **Frontend:** React, JavaScript, HTML, CSS
+- **Backend:** Python, FastAPI, SQLAlchemy
+- **Authentication:** JWT
+- **Database:** SQLite (development)
+- **Build Tool:** Vite
+- **AI Integration:** LLM-based narrative structuring (in development)
+- **Version Control:** Git, GitHub
 
-## Repository Structure
+## Getting Started
 
-```
-fragment-first/
-│
-├── backend/
-│   ├── main.py                    # FastAPI application entrypoint & middleware
-│   ├── requirements.txt           # Production & test dependencies
-│   ├── .env.example               # Environment variables template
-│   ├── .env                       # Local environment configuration
-│   ├── .gitignore                 # Backend git ignore rules
-│   ├── README.md                  # Backend technical documentation
-│   │
-│   ├── app/
-│   │   ├── __init__.py
-│   │   ├── core/                  # Security (bcrypt/JWT), config, audit logging
-│   │   │   ├── config.py
-│   │   │   ├── security.py
-│   │   │   └── audit.py
-│   │   ├── database/              # SQLAlchemy session & base model
-│   │   │   ├── base.py
-│   │   │   └── session.py
-│   │   ├── models/                # 11 SQLAlchemy database models
-│   │   │   ├── user.py
-│   │   │   ├── case.py
-│   │   │   ├── statement.py
-│   │   │   ├── reconstruction.py
-│   │   │   ├── claim.py
-│   │   │   ├── evidence.py
-│   │   │   ├── verification.py
-│   │   │   ├── timeline.py
-│   │   │   ├── investigation.py
-│   │   │   ├── report.py
-│   │   │   └── audit_log.py
-│   │   ├── schemas/               # Pydantic v2 validation models
-│   │   │   ├── user.py
-│   │   │   ├── case.py
-│   │   │   ├── statement.py
-│   │   │   ├── reconstruction.py
-│   │   │   ├── claim.py
-│   │   │   ├── evidence.py
-│   │   │   ├── verification.py
-│   │   │   ├── contradiction.py
-│   │   │   ├── timeline.py
-│   │   │   ├── investigation.py
-│   │   │   └── report.py
-│   │   ├── routes/                # 12 REST API route modules
-│   │   │   ├── auth.py
-│   │   │   ├── users.py
-│   │   │   ├── cases.py
-│   │   │   ├── statements.py
-│   │   │   ├── reconstruction.py
-│   │   │   ├── claims.py
-│   │   │   ├── evidence.py
-│   │   │   ├── verification.py
-│   │   │   ├── contradictions.py
-│   │   │   ├── timeline.py
-│   │   │   ├── investigations.py
-│   │   │   ├── reports.py
-│   │   │   └── deps.py
-│   │   ├── services/              # AI and business logic services
-│   │   │   ├── llm_service.py     # Gemini SDK + Demo Mode fallback
-│   │   │   ├── reconstruction_service.py
-│   │   │   ├── claim_service.py
-│   │   │   ├── verification_service.py
-│   │   │   ├── contradiction_service.py
-│   │   │   ├── timeline_service.py
-│   │   │   ├── investigation_service.py
-│   │   │   └── report_service.py  # ReportLab PDF generation
-│   │   └── utils/
-│   │       ├── text_extraction.py # PDF (PyMuPDF), DOCX, TXT parsers
-│   │       └── file_storage.py    # Path traversal protection & validation
-│   │
-│   ├── uploads/                   # Secure evidence file storage
-│   ├── generated_reports/         # Generated PDF reports storage
-│   └── tests/                     # 31 comprehensive automated pytest tests
-│
-├── FRONTEND_INTEGRATION.md        # Comprehensive API & frontend guide
-└── README.md                      # Platform overview & quickstart
-```
-
----
-
-## Quickstart Guide
-
-### 1. Prerequisites
-- Python 3.11+ (Tested on Python 3.13)
-- Windows PowerShell or Bash terminal
-
-### 2. Activate Virtual Environment
-```powershell
-# Windows PowerShell
-.\backend\venv\Scripts\Activate.ps1
-```
-
-### 3. Install Dependencies
-```powershell
-pip install -r backend\requirements.txt
-```
-
-### 4. Configure Environment
-Copy `.env.example` to `.env` inside `backend/`:
-```ini
-DATABASE_URL=sqlite:///./fragment_first.db
-SECRET_KEY=your-secure-random-secret-key-32-chars-min
-GEMINI_API_KEY=your_gemini_api_key_here
-LLM_PROVIDER=gemini
-DEMO_MODE=true
-FRONTEND_ORIGINS=http://localhost:5173
-MAX_UPLOAD_SIZE_MB=10
-```
-> **Note**: If `GEMINI_API_KEY` is omitted, the backend automatically runs in clearly-labeled **DEMO MODE**, providing high-fidelity synthetic responses adhering to all ethical guidelines.
-
-### 5. Run the Server
-From the `backend` directory:
-```powershell
-cd backend
-python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-Or directly from the project root:
-```powershell
-backend\venv\Scripts\python.exe -m uvicorn --app-dir backend main:app --reload --host 0.0.0.0 --port 8000
-```
-
-### 6. Interactive Documentation
-- **Swagger UI**: [http://localhost:8000/docs](http://localhost:8000/docs)
-- **ReDoc**: [http://localhost:8000/redoc](http://localhost:8000/redoc)
-
-### 7. Run Test Suite
-```powershell
-backend\venv\Scripts\pytest.exe backend/tests -v
-```
-All 31 unit and integration tests validate authentication, RBAC, statement immutability, reconstruction approval, claim extraction, evidence processing, verification assessments, contradiction detection, timeline generation, and PDF reports.
-
-
-A full-stack web application built with React, Vite, and Python. Fragments-First provides a foundation for a modern, responsive frontend connected to a Python backend.
-
-## 🚀 Tech Stack
-
-### Frontend
-- React
-- Vite
-- JavaScript
-- CSS
-
-### Backend
-- Python
-- REST API (if configured)
-- SQLite (if configured)
-
-## 📁 Project Structure
-
-```text
-Fragments-First/
-│
-├── frontend/
-│   ├── src/
-│   ├── public/
-│   ├── package.json
-│   └── vite.config.js
-│
-├── backend/
-│   ├── app/
-│   ├── uploads/
-│   ├── generated_reports/
-│   ├── requirements.txt
-│   └── .env.example
-│
-├── .gitignore
-└── README.md
-```
-
-*Note: Adjust the folder structure above to match the actual repository.*
-
-## ⚙️ Getting Started
-
-### 1. Clone the Repository
+Clone the repository:
 
 ```bash
-git clone <YOUR_REPOSITORY_URL>
+git clone https://github.com/Reva-Shukla/Fragments-First.git
 cd Fragments-First
 ```
 
-### 2. Frontend Setup
+Install frontend dependencies and start the development server:
 
 ```bash
-cd frontend
 npm install
 npm run dev
 ```
 
-The frontend will be available at the local URL displayed by Vite, usually:
+Backend setup requires separate environment configuration and dependencies.
 
-```text
-http://localhost:5173
-```
+## Team
 
-### 3. Backend Setup
+| Member | Primary Responsibility |
+|---|---|
+| **Reva Shukla** | Backend development and API implementation |
+| **Manan** | Backend development and integration |
+| **Jiya** | Frontend development |
+| **Kalash** | Frontend development and authority portal |
 
-Open a separate terminal:
+## Project Status
 
-```bash
-cd backend
-```
+**Under Development**
 
-Create a virtual environment:
-
-```bash
-python -m venv venv
-```
-
-Activate it:
-
-**Windows:**
-```bash
-venv\Scripts\activate
-```
-
-**macOS/Linux:**
-```bash
-source venv/bin/activate
-```
-
-Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-Configure environment variables using `.env.example`, if provided.
-
-Start the backend using the entry point configured in the project.
-
-## 🔐 Environment Variables
-
-Keep sensitive information in local `.env` files.
-
-Never commit:
-- API keys
-- Database credentials
-- Secret tokens
-- Private configuration
-
-Use `.env.example` to document required environment variables without exposing secrets.
-
-## 🛠️ Development
-
-Run the frontend and backend in separate terminals during development.
-
-Make sure the frontend API configuration points to the correct backend URL.
-
-## 📦 Production
-
-Before deployment:
-
-- Build the frontend using `npm run build`.
-- Configure the backend for production.
-- Set production environment variables.
-- Configure API URLs and CORS appropriately.
-- Never expose private credentials.
-
-## 🤝 Contributing
-
-1. Create a feature branch.
-2. Make your changes.
-3. Test the frontend and backend.
-4. Commit your changes.
-5. Submit a pull request.
-
-## 📄 License
-
-Add the appropriate project license here.
-
----
-
-**Fragments-First**  
-Building something meaningful, one fragment at a time.
+The project includes victim-facing and authority-facing interfaces. Backend integration, authentication, AI-assisted documentation, and end-to-end testing are ongoing.
