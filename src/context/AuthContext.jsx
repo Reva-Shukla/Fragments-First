@@ -1,96 +1,152 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { authApi } from '../api/client';
 
 const AuthContext = createContext(null);
 
-export const ROLES = [
-  {
-    id: "lead_detective",
-    title: "Lead Detective",
-    name: "Det. Elena Vance",
-    badge: "Badge #7492",
-    agency: "Metro Transit Police Department",
-    division: "Major Incident Taskforce",
-    clearance: "RESTRICTED // LAW ENFORCEMENT SENSITIVE",
-    email: "det.vance@metro-authority.gov",
-    avatar: "EV"
-  },
-  {
-    id: "forensic_specialist",
-    title: "Forensic Specialist",
-    name: "Marcus Lin",
-    badge: "Forensics #F-441",
-    agency: "State Digital & Physical Forensics Lab",
-    division: "SCADA & Telemetry Cyber Division",
-    clearance: "SECRET // FORENSIC INTEGRITY SEAL",
-    email: "m.lin@metro-forensics.gov",
-    avatar: "ML"
-  },
-  {
-    id: "legal_counsel",
-    title: "Legal Oversight Counsel",
-    name: "Rachel Stern, Esq.",
-    badge: "Bar #NY-89104",
-    agency: "Office of the District Attorney",
-    division: "Special Investigations & Admissibility",
-    clearance: "RESTRICTED // LEGAL OVERSIGHT PRIVILEGED",
-    email: "r.stern@metro-legal.gov",
-    avatar: "RS"
-  },
-  {
-    id: "senior_investigator",
-    title: "Senior Investigator",
-    name: "Cmdr. Samuel Hayes",
-    badge: "Command #0019",
-    agency: "Inter-Agency Joint Emergency Oversight",
-    division: "Incident Command Staff",
-    clearance: "TOP SECRET // INTER-AGENCY MULTI-SOURCE",
-    email: "s.hayes@joint-authority.gov",
-    avatar: "SH"
-  }
-];
-
 export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(ROLES[0]);
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
-  const [mfaVerified, setMfaVerified] = useState(true);
-
-  const login = (email, password, roleId, mfaToken) => {
-    const selectedRole = ROLES.find(r => r.id === roleId) || ROLES[0];
-    setCurrentUser({
-      ...selectedRole,
-      email: email || selectedRole.email
-    });
-    setIsAuthenticated(true);
-    setMfaVerified(true);
-  };
-
-  const logout = () => {
-    setIsAuthenticated(false);
-    setMfaVerified(false);
-  };
-
-  const switchRole = (roleId) => {
-    const found = ROLES.find(r => r.id === roleId);
-    if (found) {
-      setCurrentUser(found);
+  const [user, setUser] = useState(() => {
+    try {
+      const raw = localStorage.getItem('ff_user');
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
     }
+  });
+
+  // If a token is in localStorage, start with loading=true until verified with /api/auth/me
+  const [loading, setLoading] = useState(() => Boolean(localStorage.getItem('ff_token')));
+
+  // Verify and refresh session on mount via /api/auth/me
+  useEffect(() => {
+    const token = localStorage.getItem('ff_token');
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
+    let isMounted = true;
+    authApi
+      .me()
+      .then(({ data }) => {
+        if (isMounted) {
+          setUser(data);
+          localStorage.setItem('ff_user', JSON.stringify(data));
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          localStorage.removeItem('ff_token');
+          localStorage.removeItem('ff_user');
+          setUser(null);
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const login = useCallback(async (email, password) => {
+    setLoading(true);
+    try {
+      const { data } = await authApi.login({ email, password });
+      localStorage.setItem('ff_token', data.access_token);
+      localStorage.setItem('ff_user', JSON.stringify(data.user));
+      setUser(data.user);
+      return data.user;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const register = useCallback(async ({ email, password, username, full_name, role = 'victim' }) => {
+    // Critical security check: Never allow public registration with elevated roles
+    if (role !== 'victim') {
+      throw new Error('Public registration is restricted to victim accounts.');
+    }
+
+    setLoading(true);
+    try {
+      const { data } = await authApi.register({
+        email,
+        password,
+        username,
+        full_name: full_name || username,
+        role: 'victim',
+      });
+      localStorage.setItem('ff_token', data.access_token);
+      localStorage.setItem('ff_user', JSON.stringify(data.user));
+      setUser(data.user);
+      return data.user;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const demoLogin = useCallback(async (role) => {
+    setLoading(true);
+    try {
+      const { data } = await authApi.demoSession(role);
+      localStorage.setItem('ff_token', data.access_token);
+      localStorage.setItem('ff_user', JSON.stringify(data.user));
+      setUser(data.user);
+      return data.user;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const logout = useCallback(async () => {
+    try {
+      await authApi.logout();
+    } catch {
+      // Ignore network/server errors during logout
+    } finally {
+      localStorage.removeItem('ff_token');
+      localStorage.removeItem('ff_user');
+      setUser(null);
+    }
+  }, []);
+
+  // Display name: never falls back to email in victim-facing contexts
+  const displayName = user?.username || user?.full_name || 'You';
+
+  // Enriched currentUser object for backward compatibility with Authority Portal components
+  const currentUser = useMemo(() => {
+    if (!user) return null;
+    return {
+      ...user,
+      name: user.full_name || user.username || 'Authorized Personnel',
+      title:
+        user.role === 'admin'
+          ? 'Administrator'
+          : user.role === 'investigator'
+          ? 'Investigator'
+          : 'Victim User',
+    };
+  }, [user]);
+
+  const value = {
+    user,
+    currentUser,
+    displayName,
+    loading,
+    isAuthenticated: Boolean(user),
+    isVictim: user?.role === 'victim',
+    isInvestigator: user?.role === 'investigator' || user?.role === 'admin',
+    isAdmin: user?.role === 'admin',
+    login,
+    register,
+    demoLogin,
+    logout,
   };
 
-  return (
-    <AuthContext.Provider
-      value={{
-        currentUser,
-        isAuthenticated,
-        mfaVerified,
-        login,
-        logout,
-        switchRole,
-        availableRoles: ROLES
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {

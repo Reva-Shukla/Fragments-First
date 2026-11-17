@@ -58,3 +58,16 @@ class UsernameAvailability(BaseModel):
     username: str
     available: bool
     message: str
+
+
+class DemoSessionRequest(BaseModel):
+    role: Literal["victim", "investigator"] = Field(
+        ...,
+        description="Role to initialize demo session for ('victim' or 'investigator')"
+    )
+
+
+class DemoStatusResponse(BaseModel):
+    enabled: bool
+    allowed_roles: list[str] = Field(default_factory=list)
+    message: str

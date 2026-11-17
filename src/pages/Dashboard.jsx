@@ -93,7 +93,7 @@ export const Dashboard = () => {
           <div className="mt-6 flex items-center gap-3.5 flex-wrap">
             {/* Main Pill Button */}
             <button
-              onClick={() => navigate('/cases')}
+              onClick={() => navigate('/authority/cases')}
               className="px-5 py-2.5 rounded-full bg-[#294D6B] hover:bg-[#172D46] text-[#E8E4DC] font-sans text-xs sm:text-sm font-semibold flex items-center gap-2.5 shadow-[0_4px_16px_rgba(41,77,107,0.3)] hover:shadow-[0_6px_22px_rgba(23,45,70,0.4)] transition-all hover:-translate-y-0.5"
             >
               <Edit3 className="w-4 h-4 text-[#8FAFC4]" />
@@ -103,7 +103,7 @@ export const Dashboard = () => {
 
             {/* Secondary Claims Button */}
             <button
-              onClick={() => navigate('/claim-verification')}
+              onClick={() => navigate('/authority/claim-verification')}
               className="px-4 py-2.5 rounded-full bg-white/90 hover:bg-white text-[#294D6B] hover:text-[#172D46] font-sans text-xs sm:text-sm font-semibold border border-[#D8D2C6] hover:border-[#294D6B] transition-all shadow-xs"
             >
               Review Claims
@@ -414,7 +414,7 @@ export const Dashboard = () => {
             </div>
 
             <button
-              onClick={() => navigate('/cases')}
+              onClick={() => navigate('/authority/cases')}
               className="px-4 py-1.5 rounded-full bg-[#294D6B] hover:bg-[#172D46] text-xs font-bold text-[#E8E4DC] border border-[#294D6B] transition-all flex items-center gap-1.5 self-start sm:self-auto font-sans shadow-2xs"
             >
               <span>View All Cases</span>
@@ -463,7 +463,7 @@ export const Dashboard = () => {
                       <button
                         onClick={() => {
                           selectCase(c.id);
-                          navigate('/statement-review');
+                          navigate('/authority/statement-review');
                         }}
                         className="px-3.5 py-1 rounded-lg bg-white hover:bg-[#294D6B] text-[#294D6B] hover:text-[#E8E4DC] text-[11px] font-bold border border-[#D8D2C6] hover:border-[#294D6B] transition-all font-sans shadow-2xs"
                       >
@@ -496,7 +496,7 @@ export const Dashboard = () => {
               </div>
 
               <button
-                onClick={() => navigate('/audit-logs')}
+                onClick={() => navigate('/authority/audit-logs')}
                 className="px-3 py-1 rounded-full bg-white hover:bg-[#F8F6F1] text-xs font-bold text-[#294D6B] border border-[#D8D2C6] hover:border-[#294D6B] transition-all shrink-0 font-sans shadow-2xs"
               >
                 Full Log

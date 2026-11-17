@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Menu, 
   Bell, 
@@ -6,17 +7,24 @@ import {
   UserCheck, 
   ChevronDown, 
   FolderGit2,
-  Check
+  Check,
+  LogOut
 } from 'lucide-react';
 import { useCase } from '../../context/CaseContext';
 import { useAuth } from '../../context/AuthContext';
 
 export const Header = ({ onMenuClick }) => {
+  const navigate = useNavigate();
   const { cases, currentCase, selectCase } = useCase();
-  const { currentUser, switchRole, availableRoles } = useAuth();
+  const { currentUser, logout } = useAuth();
   const [showRoleMenu, setShowRoleMenu] = useState(false);
   const [showCaseMenu, setShowCaseMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
+  };
 
   return (
     <header className="h-16 bg-[#FCFBF9]/95 backdrop-blur-xl border-b border-[#D8D2C6] px-4 lg:px-6 flex items-center justify-between sticky top-0 z-30 shadow-[0_2px_14px_rgba(23,45,70,0.03)]">
@@ -107,31 +115,31 @@ export const Header = ({ onMenuClick }) => {
 
           {showRoleMenu && (
             <div 
-              className="absolute right-0 mt-2 w-72 bg-[#FCFBF9]/98 backdrop-blur-2xl border border-[#D8D2C6] rounded-2xl shadow-[0_16px_40px_rgba(23,45,70,0.15)] p-2 z-50 text-xs"
+              className="absolute right-0 mt-2 w-72 bg-[#FCFBF9]/98 backdrop-blur-2xl border border-[#D8D2C6] rounded-2xl shadow-[0_16px_40px_rgba(23,45,70,0.15)] p-3 z-50 text-xs"
               onClick={() => setShowRoleMenu(false)}
             >
-              <div className="px-3 py-1.5 text-[10px] font-sans uppercase tracking-wider text-[#294D6B] font-bold border-b border-[#D8D2C6]">
-                Switch Authority Persona / Role
+              <div className="px-1 py-1 text-[10px] font-sans uppercase tracking-wider text-[#294D6B] font-bold border-b border-[#D8D2C6] mb-2">
+                Active Authority Session
               </div>
-              <div className="mt-1 space-y-1">
-                {availableRoles.map((role) => (
-                  <button
-                    key={role.id}
-                    onClick={() => switchRole(role.id)}
-                    className={`w-full text-left p-2.5 rounded-xl flex items-center justify-between transition-all ${
-                      role.id === currentUser?.id
-                        ? 'bg-[#E8E4DC]/80 border border-[#D8D2C6] text-[#172D46]'
-                        : 'hover:bg-[#F8F6F1] text-[#233B54]'
-                    }`}
-                  >
-                    <div>
-                      <div className="font-serif-clean font-bold text-xs text-[#172D46]">{role.title}</div>
-                      <div className="font-sans text-[11px] text-[#5E7A91]">{role.name} ({role.badge})</div>
-                      <div className="text-[10px] text-[#294D6B] mt-0.5 font-sans font-medium">{role.division}</div>
-                    </div>
-                    {role.id === currentUser?.id && <Check className="w-4 h-4 text-[#294D6B] shrink-0" />}
-                  </button>
-                ))}
+              <div className="space-y-1.5 p-2.5 bg-[#F8F6F1] rounded-xl border border-[#D8D2C6]/60">
+                <div className="font-serif-clean font-bold text-sm text-[#172D46]">{currentUser?.name || 'Investigator'}</div>
+                <div className="font-mono text-[11px] text-[#5E7A91] truncate">{currentUser?.email}</div>
+                <div className="flex items-center gap-1.5 pt-1">
+                  <span className="px-2 py-0.5 rounded-full bg-[#294D6B] text-[#E8E4DC] font-mono text-[9px] font-bold uppercase tracking-wider">
+                    {currentUser?.role || 'INVESTIGATOR'}
+                  </span>
+                  <span className="text-[10px] text-[#5E7A91]">Verified JWT</span>
+                </div>
+              </div>
+              <div className="mt-2 pt-2 border-t border-[#D8D2C6]">
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="w-full py-2 px-3 rounded-xl text-left text-xs font-semibold text-[#9B2C2C] hover:bg-[#9B2C2C]/10 flex items-center gap-2 transition-colors cursor-pointer"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Sign Out</span>
+                </button>
               </div>
             </div>
           )}

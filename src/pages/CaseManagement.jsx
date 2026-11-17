@@ -194,7 +194,7 @@ export const CaseManagement = () => {
                 <button
                   onClick={() => {
                     selectCase(caseItem.id);
-                    navigate('/statement-review');
+                    navigate('/authority/statement-review');
                   }}
                   className="px-4 py-1.5 bg-[#294D6B] hover:bg-[#172D46] text-[#E8E4DC] rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-[0_2px_10px_rgba(41,77,107,0.25)] hover:shadow-[0_4px_16px_rgba(23,45,70,0.35)] transition-all font-sans"
                 >
@@ -276,7 +276,7 @@ export const CaseManagement = () => {
                   onClick={() => {
                     selectCase(selectedCaseForModal.id);
                     setSelectedCaseForModal(null);
-                    navigate('/statement-review');
+                    navigate('/authority/statement-review');
                   }}
                   className="p-2.5 bg-white hover:bg-[#EAF1F7] border border-[#D8D2C6] hover:border-[#294D6B] rounded-xl text-[#172D46] text-center flex flex-col items-center gap-1 transition-all shadow-2xs font-sans font-medium"
                 >
@@ -287,7 +287,7 @@ export const CaseManagement = () => {
                   onClick={() => {
                     selectCase(selectedCaseForModal.id);
                     setSelectedCaseForModal(null);
-                    navigate('/evidence');
+                    navigate('/authority/evidence');
                   }}
                   className="p-2.5 bg-white hover:bg-[#EAF1F7] border border-[#D8D2C6] hover:border-[#294D6B] rounded-xl text-[#172D46] text-center flex flex-col items-center gap-1 transition-all shadow-2xs font-sans font-medium"
                 >
@@ -298,7 +298,7 @@ export const CaseManagement = () => {
                   onClick={() => {
                     selectCase(selectedCaseForModal.id);
                     setSelectedCaseForModal(null);
-                    navigate('/timeline');
+                    navigate('/authority/timeline');
                   }}
                   className="p-2.5 bg-white hover:bg-[#EAF1F7] border border-[#D8D2C6] hover:border-[#294D6B] rounded-xl text-[#172D46] text-center flex flex-col items-center gap-1 transition-all shadow-2xs font-sans font-medium"
                 >
@@ -309,7 +309,7 @@ export const CaseManagement = () => {
                   onClick={() => {
                     selectCase(selectedCaseForModal.id);
                     setSelectedCaseForModal(null);
-                    navigate('/reports');
+                    navigate('/authority/reports');
                   }}
                   className="p-2.5 bg-white hover:bg-[#EAF1F7] border border-[#D8D2C6] hover:border-[#294D6B] rounded-xl text-[#172D46] text-center flex flex-col items-center gap-1 transition-all shadow-2xs font-sans font-medium"
                 >

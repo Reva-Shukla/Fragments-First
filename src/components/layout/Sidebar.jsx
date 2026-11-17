@@ -17,16 +17,16 @@ import {
 import { useAuth } from '../../context/AuthContext';
 
 const NAV_ITEMS = [
-  { path: '/dashboard', label: 'Dashboard', icon: Home },
-  { path: '/cases', label: 'Report Incident', icon: FileText },
-  { path: '/evidence', label: 'Track Status', icon: Search },
-  { path: '/statement-review', label: 'Statement Review', icon: FileText },
-  { path: '/timeline', label: 'Timeline Analysis', icon: Clock },
-  { path: '/correlation', label: 'Service Correlation', icon: Share2 },
-  { path: '/claim-verification', label: 'Claim Verification', icon: CheckCircle2 },
-  { path: '/root-cause', label: 'Root Cause Analysis', icon: GitFork },
-  { path: '/reports', label: 'Resources', icon: BookOpen },
-  { path: '/audit-logs', label: 'Help & Support', icon: Headphones }
+  { path: '/authority/dashboard', label: 'Dashboard', icon: Home },
+  { path: '/authority/cases', label: 'Report Incident', icon: FileText },
+  { path: '/authority/evidence', label: 'Track Status', icon: Search },
+  { path: '/authority/statement-review', label: 'Statement Review', icon: FileText },
+  { path: '/authority/timeline', label: 'Timeline Analysis', icon: Clock },
+  { path: '/authority/correlation', label: 'Service Correlation', icon: Share2 },
+  { path: '/authority/claim-verification', label: 'Claim Verification', icon: CheckCircle2 },
+  { path: '/authority/root-cause', label: 'Root Cause Analysis', icon: GitFork },
+  { path: '/authority/reports', label: 'Resources', icon: BookOpen },
+  { path: '/authority/audit-logs', label: 'Help & Support', icon: Headphones }
 ];
 
 export const Sidebar = ({ mobileOpen, setMobileOpen }) => {

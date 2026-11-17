@@ -1,62 +1,87 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { 
   ShieldCheck, 
   KeyRound, 
   Mail, 
   Lock, 
-  UserCheck, 
   ArrowRight, 
   AlertCircle, 
-  CheckCircle, 
-  Smartphone,
-  Eye,
-  EyeOff,
-  Fingerprint
+  Eye, 
+  EyeOff, 
+  Fingerprint,
+  Sparkles
 } from 'lucide-react';
-import { useAuth, ROLES } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
 export const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, demoLogin, logout } = useAuth();
 
-  const [selectedRole, setSelectedRole] = useState(ROLES[0].id);
-  const [email, setEmail] = useState(ROLES[0].email);
-  const [password, setPassword] = useState('••••••••••••');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [mfaCode, setMfaCode] = useState(['4', '8', '9', '2', '1', '0']);
-  const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [demoLoading, setDemoLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetSent, setResetSent] = useState(false);
 
-  const handleRoleChange = (roleId) => {
-    setSelectedRole(roleId);
-    const found = ROLES.find(r => r.id === roleId);
-    if (found) {
-      setEmail(found.email);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrorMessage('');
+
+    if (!email.trim() || !password) {
+      setErrorMessage('Please enter both your official agency email and password.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const user = await login(email.trim().toLowerCase(), password);
+
+      // Verify investigator/admin role — victim accounts cannot enter Authority Portal
+      if (user.role === 'victim') {
+        await logout();
+        setErrorMessage('Access denied. This portal is restricted to authorized investigative and legal oversight personnel.');
+        return;
+      }
+
+      navigate('/authority/dashboard');
+    } catch (err) {
+      const detail = err.response?.data?.detail;
+      if (typeof detail === 'string') {
+        setErrorMessage(detail);
+      } else if (Array.isArray(detail)) {
+        setErrorMessage(detail[0]?.msg || 'Validation error.');
+      } else {
+        setErrorMessage('Unable to authorize credentials. Please check your email and password.');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleCredentialsSubmit = (e) => {
-    e.preventDefault();
-    setStep(2);
-  };
-
-  const handleMfaSubmit = (e) => {
-    e.preventDefault();
-    login(email, password, selectedRole, mfaCode.join(''));
-    navigate('/dashboard');
-  };
-
-  const handleMfaDigitChange = (index, value) => {
-    if (value.length > 1) value = value.slice(-1);
-    const nextCode = [...mfaCode];
-    nextCode[index] = value;
-    setMfaCode(nextCode);
-
-    if (value && index < 5) {
-      const nextInput = document.getElementById(`mfa-${index + 1}`);
-      if (nextInput) nextInput.focus();
+  const handleDemoLogin = async () => {
+    setErrorMessage('');
+    setDemoLoading(true);
+    try {
+      const user = await demoLogin('investigator');
+      if (user.role === 'victim') {
+        await logout();
+        setErrorMessage('Access denied. Demo investigator role required.');
+        return;
+      }
+      navigate('/authority/dashboard');
+    } catch (err) {
+      const detail = err.response?.data?.detail;
+      if (typeof detail === 'string') {
+        setErrorMessage(detail);
+      } else {
+        setErrorMessage('Authority demo login unavailable. Ensure LOCAL_DEMO_MODE=True in backend configuration.');
+      }
+    } finally {
+      setDemoLoading(false);
     }
   };
 
@@ -91,138 +116,127 @@ export const Login = () => {
         {/* Specular top hairline in antique gold */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#294D6B] via-[#C5A77B] to-[#294D6B]" />
 
-        {step === 1 ? (
-          <form onSubmit={handleCredentialsSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-[#172D46] uppercase tracking-wider mb-2">
-                Authority Role Identification
-              </label>
-              <div className="grid grid-cols-2 gap-2">
-                {ROLES.map((role) => (
-                  <button
-                    type="button"
-                    key={role.id}
-                    onClick={() => handleRoleChange(role.id)}
-                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
-                      selectedRole === role.id
-                        ? 'bg-[#294D6B] border-[#172D46] text-white shadow-xs font-medium'
-                        : 'bg-white border-[#D8D2C6] text-[#5E7A91] hover:text-[#172D46] hover:border-[#294D6B]'
-                    }`}
-                  >
-                    <div className="text-[11px] font-bold truncate">{role.title}</div>
-                    <div className={`text-[10px] truncate mt-0.5 ${selectedRole === role.id ? 'text-[#8FAFC4]' : 'text-[#8FAFC4]'}`}>
-                      {role.name}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
+        <div className="mb-4">
+          <div className="text-xs font-bold text-[#172D46] uppercase tracking-wider mb-1">
+            Authority Personnel Sign-In
+          </div>
+          <p className="text-xs text-[#5E7A91] font-reading">
+            Enter your official agency credentials to access assigned investigation dockets.
+          </p>
+        </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-[#172D46] mb-1">
-                Official Agency Email
-              </label>
-              <div className="relative">
-                <Mail className="w-4 h-4 text-[#8FAFC4] absolute left-3 top-3" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="w-full bg-white border border-[#D8D2C6] rounded-xl pl-9 pr-3 py-2.5 text-xs text-[#172D46] placeholder-[#8FAFC4] focus:outline-hidden focus:border-[#294D6B] font-mono transition-all shadow-xs"
-                  placeholder="investigator@agency.gov"
-                />
-              </div>
-            </div>
+        {/* Error Alert Banner */}
+        {errorMessage && (
+          <div className="mb-4 p-3 bg-[#9B2C2C]/10 border border-[#9B2C2C]/30 rounded-xl text-xs text-[#9B2C2C] flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <span>{errorMessage}</span>
+          </div>
+        )}
 
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="text-xs font-semibold text-[#172D46]">Password</label>
-                <button
-                  type="button"
-                  onClick={() => setShowForgotPassword(true)}
-                  className="text-[11px] text-[#294D6B] hover:text-[#172D46] hover:underline font-medium cursor-pointer"
-                >
-                  Forgot Password?
-                </button>
-              </div>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-[#8FAFC4] absolute left-3 top-3" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="w-full bg-white border border-[#D8D2C6] rounded-xl pl-9 pr-9 py-2.5 text-xs text-[#172D46] placeholder-[#8FAFC4] focus:outline-hidden focus:border-[#294D6B] transition-all shadow-xs"
-                  placeholder="••••••••••••"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3 text-[#8FAFC4] hover:text-[#172D46] cursor-pointer"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-[#172D46] mb-1">
+              Official Agency Email
+            </label>
+            <div className="relative">
+              <Mail className="w-4 h-4 text-[#8FAFC4] absolute left-3 top-3" />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+                autoFocus
+                className="w-full bg-white border border-[#D8D2C6] rounded-xl pl-9 pr-3 py-2.5 text-xs text-[#172D46] placeholder-[#8FAFC4] focus:outline-hidden focus:border-[#294D6B] font-mono transition-all shadow-xs"
+                placeholder="investigator@agency.gov"
+              />
             </div>
+          </div>
 
-            <button
-              type="submit"
-              className="w-full mt-2 py-3 px-4 bg-[#294D6B] hover:bg-[#172D46] text-white font-medium text-xs rounded-xl flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
-            >
-              <span>Continue to Multi-Factor Authentication</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </form>
-        ) : (
-          <form onSubmit={handleMfaSubmit} className="space-y-4">
-            <div className="text-center">
-              <div className="w-12 h-12 rounded-2xl bg-[#EAF1F7] border border-[#294D6B]/30 text-[#294D6B] flex items-center justify-center mx-auto mb-2.5 shadow-xs">
-                <Smartphone className="w-6 h-6" />
-              </div>
-              <h2 className="text-sm font-bold text-[#172D46]">Hardware / App MFA Verification</h2>
-              <p className="text-xs text-[#5E7A91] mt-1 font-reading">
-                Enter the 6-digit cryptographic verification code sent to your authorized authenticator app or hardware key.
-              </p>
-            </div>
-
-            <div className="flex justify-center gap-2 my-4">
-              {mfaCode.map((digit, i) => (
-                <input
-                  key={i}
-                  id={`mfa-${i}`}
-                  type="text"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleMfaDigitChange(i, e.target.value)}
-                  className="w-11 h-12 text-center text-lg font-mono font-bold bg-white border-2 border-[#D8D2C6] rounded-xl text-[#172D46] focus:border-[#294D6B] focus:outline-hidden transition-all shadow-xs"
-                />
-              ))}
-            </div>
-
-            <div className="p-3 bg-[#FAF6EF] border border-[#C5A77B]/50 rounded-xl text-[11px] text-[#8E6E3C] flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-[#C5A77B] shrink-0" />
-              <span>Session will be bound to FIPS 140-3 Hardware Token ID #4910</span>
-            </div>
-
-            <div className="flex gap-2">
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs font-semibold text-[#172D46]">Password</label>
               <button
                 type="button"
-                onClick={() => setStep(1)}
-                className="w-1/3 py-2.5 px-3 bg-white hover:bg-gray-50 text-[#5E7A91] text-xs font-medium rounded-xl border border-[#D8D2C6] transition-colors cursor-pointer"
+                onClick={() => setShowForgotPassword(true)}
+                className="text-[11px] text-[#294D6B] hover:text-[#172D46] hover:underline font-medium cursor-pointer"
               >
-                Back
-              </button>
-              <button
-                type="submit"
-                className="w-2/3 py-2.5 px-4 bg-[#294D6B] hover:bg-[#172D46] text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
-              >
-                <span>Authorize & Enter</span>
-                <CheckCircle className="w-4 h-4" />
+                Forgot Password?
               </button>
             </div>
-          </form>
-        )}
+            <div className="relative">
+              <Lock className="w-4 h-4 text-[#8FAFC4] absolute left-3 top-3" />
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+                className="w-full bg-white border border-[#D8D2C6] rounded-xl pl-9 pr-9 py-2.5 text-xs text-[#172D46] placeholder-[#8FAFC4] focus:outline-hidden focus:border-[#294D6B] transition-all shadow-xs"
+                placeholder="••••••••••••"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-3 text-[#8FAFC4] hover:text-[#172D46] cursor-pointer"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full mt-2 py-3 px-4 bg-[#294D6B] hover:bg-[#172D46] disabled:opacity-60 text-white font-medium text-xs rounded-xl flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
+          >
+            {loading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span>Authenticating Credentials...</span>
+              </>
+            ) : (
+              <>
+                <span>Authenticate & Access Docket</span>
+                <ArrowRight className="w-4 h-4" />
+              </>
+            )}
+          </button>
+        </form>
+
+        {/* Local Demo Mode Quick Launch */}
+        <div className="mt-5 pt-4 border-t border-[#D8D2C6]">
+          <div className="text-[11px] font-semibold text-[#8E6E3C] uppercase tracking-wider mb-2 flex items-center justify-between font-mono">
+            <span>Evaluation &amp; Judge Access</span>
+            <span className="text-[10px] text-[#5E7A91] lowercase bg-[#E8E4DC]/60 px-1.5 py-0.5 rounded font-mono">local demo</span>
+          </div>
+          <button
+            type="button"
+            id="authority-demo-btn"
+            disabled={demoLoading || loading}
+            onClick={handleDemoLogin}
+            className="w-full py-2.5 px-3.5 bg-[#FAF6EF] hover:bg-[#F2ECE1] text-[#172D46] border border-[#C5A77B] rounded-xl font-medium text-xs shadow-2xs hover:shadow-xs transition-all flex items-center justify-between cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed group"
+          >
+            <div className="flex items-center gap-2.5 text-left">
+              <div className="w-7 h-7 rounded-lg bg-[#C5A77B]/20 text-[#8E6E3C] flex items-center justify-center shrink-0">
+                <Sparkles className="w-3.5 h-3.5 text-[#C5A77B]" />
+              </div>
+              <div>
+                <div className="font-semibold text-[#172D46] group-hover:text-[#294D6B] transition-colors">
+                  Explore Authority Demo
+                </div>
+                <div className="text-[10px] text-[#5E7A91] font-mono">
+                  Det. Marcus Vance • Full Investigation Dockets
+                </div>
+              </div>
+            </div>
+            {demoLoading ? (
+              <div className="w-4 h-4 border-2 border-[#C5A77B]/30 border-t-[#C5A77B] rounded-full animate-spin" />
+            ) : (
+              <ArrowRight className="w-3.5 h-3.5 text-[#C5A77B] group-hover:translate-x-0.5 transition-transform" />
+            )}
+          </button>
+        </div>
 
         {/* Forgot Password Modal */}
         {showForgotPassword && (
@@ -237,7 +251,7 @@ export const Login = () => {
               </p>
               {resetSent ? (
                 <div className="p-3 bg-[#FAF6EF] border border-[#C5A77B]/50 rounded-xl text-xs text-[#8E6E3C]">
-                  Password reset ticket #SEC-7701 generated. A temporary security token was dispatched to your agency supervisor.
+                  Password reset ticket generated. A temporary security token was dispatched to your agency supervisor.
                 </div>
               ) : (
                 <input
@@ -275,6 +289,16 @@ export const Login = () => {
         <div className="mt-5 pt-3 border-t border-[#D8D2C6] text-[10px] text-[#8FAFC4] text-center font-mono font-medium">
           CJIS • HIPAA • NIST 800-53 REV 5 COMPLIANT ENVIRONMENT
         </div>
+      </div>
+
+      {/* Navigation Links */}
+      <div className="mt-4 text-center flex flex-col gap-1.5 text-xs relative z-10">
+        <Link to="/victim/login" className="text-[#C5A77B] hover:text-white transition-colors">
+          Switch to Victim &amp; Witness Space →
+        </Link>
+        <Link to="/" className="text-[#8FAFC4] hover:text-[#E8E4DC] transition-colors">
+          ← Return to Fragment First Home
+        </Link>
       </div>
     </div>
   );

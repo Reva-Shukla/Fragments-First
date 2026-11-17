@@ -88,15 +88,26 @@ def victim_token(client):
 
 @pytest.fixture(scope="session")
 def investigator_token(client):
-    reg_data = {
-        "email": "investigator_test@example.com",
-        "full_name": "Detective Miller",
-        "password": "Password123!",
-        "role": "investigator"
-    }
-    resp = client.post("/api/auth/register", json=reg_data)
-    assert resp.status_code == 201, resp.text
-    return resp.json()["access_token"]
+    from app.models.user import User
+    from app.core.security import hash_password, create_access_token
+    db = TestingSessionLocal()
+    try:
+        inv = db.query(User).filter(User.email == "investigator_test@example.com").first()
+        if not inv:
+            inv = User(
+                email="investigator_test@example.com",
+                username="det_miller",
+                full_name="Detective Miller",
+                hashed_password=hash_password("Password123!"),
+                role="investigator",
+                is_active=True
+            )
+            db.add(inv)
+            db.commit()
+            db.refresh(inv)
+        return create_access_token(data={"sub": inv.email, "role": inv.role, "id": inv.id})
+    finally:
+        db.close()
 
 
 @pytest.fixture(scope="session")

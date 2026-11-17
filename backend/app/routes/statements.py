@@ -67,14 +67,25 @@ def get_case_statements(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Retrieves all statements recorded for a case."""
+    """
+    Retrieves all statements recorded for a case.
+    
+    PRIVACY & ISOLATION ENFORCEMENT:
+    Draft statements (is_draft=True or status='draft') are strictly private to the victim author.
+    Investigators and third parties NEVER receive private drafts; they only see finalized, submitted records.
+    """
     case = db.query(Case).filter(Case.id == case_id).first()
     if not case:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Case not found")
 
     check_case_access(case, current_user)
 
-    statements = db.query(Statement).filter(Statement.case_id == case_id).order_by(Statement.version.asc()).all()
+    query = db.query(Statement).filter(Statement.case_id == case_id)
+    # If the requester is an investigator or not the authoring victim, filter out private drafts
+    if current_user.role == "investigator" or (current_user.role != "admin" and current_user.id != case.victim_id):
+        query = query.filter(Statement.is_draft == False, Statement.status != "draft")
+
+    statements = query.order_by(Statement.version.asc()).all()
     return statements
 
 
@@ -84,12 +95,24 @@ def get_statement(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Retrieves a single statement by ID including historical reconstructions."""
+    """
+    Retrieves a single statement by ID including historical reconstructions.
+    
+    PRIVACY & ISOLATION ENFORCEMENT:
+    Investigators cannot directly request a victim's private unsubmitted draft by ID.
+    """
     statement = db.query(Statement).filter(Statement.id == statement_id).first()
     if not statement:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Statement not found")
 
     check_case_access(statement.case, current_user)
+
+    if (statement.is_draft or statement.status == "draft") and current_user.role != "admin" and current_user.id != statement.victim_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Draft statements are private and accessible only to the author."
+        )
+
     return statement
 
 

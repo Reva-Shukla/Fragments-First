@@ -23,6 +23,19 @@ class Settings(BaseSettings):
     PRUNE_API_KEY: Union[str, None] = None
     LLM_PROVIDER: str = "gemini"
     DEMO_MODE: bool = True
+
+    # Local Demo Mode & Credentials Configuration
+    # Disabled by default; unavailable in production unless explicitly enabled via LOCAL_DEMO_MODE=true
+    LOCAL_DEMO_MODE: bool = False
+    DEMO_VICTIM_EMAIL: str = "demo.victim@fragmentsfirst.org"
+    DEMO_VICTIM_PASSWORD: str = "DemoVictim2026!"
+    DEMO_VICTIM_USERNAME: str = "SafeHarbor_42"
+    DEMO_VICTIM_NAME: str = "Demo Participant (SafeHarbor)"
+
+    DEMO_INVESTIGATOR_EMAIL: str = "demo.investigator@fragmentsfirst.org"
+    DEMO_INVESTIGATOR_PASSWORD: str = "DemoInvestigator2026!"
+    DEMO_INVESTIGATOR_USERNAME: str = "det_vance"
+    DEMO_INVESTIGATOR_NAME: str = "Senior Det. Marcus Vance"
     
     # CORS
     FRONTEND_ORIGINS: Union[List[str], str] = [

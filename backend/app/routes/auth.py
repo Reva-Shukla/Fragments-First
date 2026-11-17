@@ -15,8 +15,10 @@ from app.core.audit import create_audit_log
 from app.database.session import get_db
 from app.models.user import User
 from app.schemas.user import (
-    UserCreate, UserLogin, UserResponse, TokenResponse, UsernameAvailability
+    UserCreate, UserLogin, UserResponse, TokenResponse, UsernameAvailability,
+    DemoSessionRequest, DemoStatusResponse
 )
+from app.database.demo_seed import seed_demo_data
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -74,12 +76,13 @@ def check_username(
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
 def register(user_in: UserCreate, request: Request, db: Session = Depends(get_db)):
     """
-    Registers a new user (Victim or Investigator) and returns an access token.
+    Registers a new user account.
 
-    Username (pseudonymous display identity):
-    - Required and unique for victim accounts.
-    - Optional for investigator/admin accounts (falls back to full_name).
-    - Never exposed in authority-facing interfaces.
+    SECURITY ENFORCEMENT:
+    Public registration strictly provisions accounts with role="victim".
+    Any client-submitted elevated role (investigator, admin) is explicitly ignored and overridden.
+    Investigator and administrator accounts must be provisioned through separate,
+    trusted local administrative procedures or official dispatch integration.
     """
     # Check email uniqueness
     existing_email = db.query(User).filter(User.email == user_in.email).first()
@@ -90,7 +93,14 @@ def register(user_in: UserCreate, request: Request, db: Session = Depends(get_db
         )
 
     # Determine and validate username
-    raw_username = user_in.username or user_in.full_name
+    if user_in.username:
+        raw_username = user_in.username
+    else:
+        # Sanitize fallback username from full_name or email so spaces/symbols don't fail regex
+        source = user_in.full_name or user_in.email.split("@")[0]
+        cleaned = re.sub(r"[^A-Za-z0-9_.\-]", "_", source).strip("_")
+        raw_username = cleaned[:50] if len(cleaned) >= 2 else f"user_{cleaned[:40]}"
+
     normalised_username = _validate_username_format(raw_username)
 
     # Check username uniqueness
@@ -107,7 +117,7 @@ def register(user_in: UserCreate, request: Request, db: Session = Depends(get_db
         hashed_password=hashed_pw,
         username=normalised_username,
         full_name=user_in.full_name,
-        role=user_in.role,
+        role="victim",  # Strictly locked to victim role
         is_active=True
     )
     db.add(user)
@@ -121,6 +131,96 @@ def register(user_in: UserCreate, request: Request, db: Session = Depends(get_db
         target_id=user.id,
         user_id=user.id,
         details=f"Registered user with role '{user.role}' and username '{user.username}'",
+        ip_address=request.client.host if request.client else None
+    )
+
+    access_token = create_access_token(
+        data={"sub": user.email, "role": user.role, "id": user.id}
+    )
+
+    return TokenResponse(
+        access_token=access_token,
+        token_type="bearer",
+        user=UserResponse.model_validate(user)
+    )
+
+
+@router.get("/demo-status", response_model=DemoStatusResponse, summary="Check demo login mode status")
+def get_demo_status():
+    """
+    Returns whether LOCAL_DEMO_MODE is enabled on the server.
+    Used by frontend login pages to determine whether to enable 'Explore Demo' buttons.
+    """
+    if not settings.LOCAL_DEMO_MODE:
+        return DemoStatusResponse(
+            enabled=False,
+            allowed_roles=[],
+            message="Local demo mode is disabled in this environment."
+        )
+    return DemoStatusResponse(
+        enabled=True,
+        allowed_roles=["victim", "investigator"],
+        message="Local demo mode is enabled for demonstration and hackathon evaluation."
+    )
+
+
+@router.post("/demo-session", response_model=TokenResponse, summary="Start authenticated demo session")
+def create_demo_session(
+    payload: DemoSessionRequest,
+    request: Request,
+    db: Session = Depends(get_db)
+):
+    """
+    Issues a valid signed JWT access token for a pre-configured demo account.
+
+    SECURITY SAFEGUARDS:
+    - Disabled by default; returns HTTP 403 Forbidden unless LOCAL_DEMO_MODE=True.
+    - Strictly restricts requested role to allowed preset identities ('victim' or 'investigator').
+    - Disallows arbitrary user impersonation.
+    - Ensures demo dataset is seeded and intact.
+    """
+    if not settings.LOCAL_DEMO_MODE:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Local demo mode is disabled in this environment."
+        )
+
+    if payload.role == "victim":
+        target_email = settings.DEMO_VICTIM_EMAIL
+        target_role = "victim"
+    elif payload.role == "investigator":
+        target_email = settings.DEMO_INVESTIGATOR_EMAIL
+        target_role = "investigator"
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid demo role requested."
+        )
+
+    # Ensure demo dataset exists in the database
+    seed_demo_data(db)
+
+    # Retrieve target demo user
+    user = db.query(User).filter(User.email == target_email).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Demo account could not be initialized."
+        )
+
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Demo account is currently inactive."
+        )
+
+    create_audit_log(
+        db=db,
+        action="DEMO_LOGIN",
+        target_type="User",
+        target_id=user.id,
+        user_id=user.id,
+        details=f"Demo session started for role '{target_role}' ({user.email})",
         ip_address=request.client.host if request.client else None
     )
 
